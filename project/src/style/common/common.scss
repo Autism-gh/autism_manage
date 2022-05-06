@@ -1,0 +1,40 @@
+@mixin b($block) {
+    $B: $block !global;
+    .#{$B} {
+        @content;
+    }
+}
+
+$modifier-separator: '--';
+
+@mixin m($modifier) {
+    $selector: &;
+    $currentSelector: "";
+
+    @each $unit in $modifier {
+        $currentSelector: #{$currentSelector + & + $modifier-separator + $unit + ","};
+    }
+
+    @at-root {
+        #{$currentSelector} {
+            @content;
+        }
+    }
+}
+
+
+@include b(flex) {
+    display: flex;
+    @include m(center) {
+        align-items: center;
+        justify-content: center;
+    }
+    @include m(start) {
+        justify-content: flex-start;
+        align-items: center;
+    }
+    @include m(end) {
+        justify-content: flex-end;
+        align-items: center;
+    }
+}
