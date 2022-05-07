@@ -1,19 +1,19 @@
 <template>
-    <div v-if="errorLogs.length>0">
-        <el-badge :is-dot="true" style="line-height: 25px;margin-top: -5px;" @click="dialogTableVisible=true">
+    <div>
+        <el-badge :is-dot="true" style="line-height: 25px;margin-top: -5px;" @click="dialogTableVisible = true">
             <el-button style="padding: 8px 10px;" size="small" type="danger">
-                <i class="el-icon-circle-close" />
+                <i class="font--16 el-icon-circle-close" />
             </el-button>
         </el-badge>
 
         <el-dialog v-model="dialogTableVisible" width="80%" append-to-body>
-            <template #title>
+            <template slot="title">
                 <span style="padding-right: 10px;">Error Log</span>
                 <el-button size="mini" type="primary" icon="el-icon-delete" @click="clearAll">Clear All</el-button>
             </template>
             <el-table :data="errorLogs" border>
                 <el-table-column label="Message">
-                    <template #default="{row}">
+                    <template slot-scope="{row}">
                         <div>
                             <span class="message-title">Msg:</span>
                             <el-tag type="danger">

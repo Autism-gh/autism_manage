@@ -1,5 +1,13 @@
 module.exports = {
     title: 'Vue Element Admin',
+
+    /**
+     * 
+     * @type {boolean} true | false
+     * @description 显示左下角吉祥物
+     * 
+     */
+    showWife: true,
   
     /**
      * @type {boolean} true | false
@@ -17,7 +25,7 @@ module.exports = {
      * @type {boolean} true | false
      * @description Whether fix the header
      */
-    fixedHeader: false,
+    fixedHeader: true,
   
     /**
      * @type {boolean} true | false

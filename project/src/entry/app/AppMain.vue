@@ -30,11 +30,7 @@ export default {
   position: relative;
   overflow: hidden;
 
-  background-color: #f6f6f6;
-}
-
-.fixed-header+.app-main {
-  padding-top: 50px;
+  background-color: var(--app-main);
 }
 
 .hasTagsView {
@@ -45,7 +41,7 @@ export default {
   }
 
   .fixed-header+.app-main {
-    padding-top: 84px;
+    margin-top: 84px;
   }
 }
 </style>

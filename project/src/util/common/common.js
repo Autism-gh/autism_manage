@@ -5,6 +5,10 @@
  * @param {Object} source
  * @returns {Object}
  */
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+
 export function deepClone(source) {
     if (!source && typeof source !== 'object') {
         throw new Error('error arguments', 'deepClone')
@@ -19,3 +23,91 @@ export function deepClone(source) {
     })
     return targetObj
 }
+
+
+/**
+ * 
+ * @param {*} to 
+ * @param {*} _from 
+ * @returns 
+ */
+function extend(to, _from) {
+    for (let key in _from) {
+        to[key] = _from[key];
+    }
+    return to;
+};
+
+export function toObject(arr) {
+    var res = {};
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+            extend(res, arr[i]);
+        }
+    }
+    return res;
+};
+
+/**
+ * 
+ * @param {*} obj 
+ * @param {*} key 
+ * @returns 
+ */
+export function hasOwn(obj, key) {
+    return hasOwnProperty.call(obj, key);
+};
+
+
+/**
+ * 
+ * @param {*} val 
+ * @returns 
+ */
+export const isEmpty = function (val) {
+    // null or undefined
+    if (val == null) return true;
+
+    if (typeof val === 'boolean') return false;
+
+    if (typeof val === 'number') return !val;
+
+    if (val instanceof Error) return val.message === '';
+
+    switch (Object.prototype.toString.call(val)) {
+        case '[object String]':
+        case '[object Array]':
+            return !val.length;
+        case '[object File]':
+        case '[object Map]':
+        case '[object Set]': {
+            return !val.size;
+        }
+        case '[object Object]': {
+            return !Object.keys(val).length;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * 
+ * @param {*} ms 
+ * @returns 
+ */
+export async function timeSleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve()
+        }, ms);
+    })
+}
+
+/**
+ * 
+ * @returns 
+ */
+export const generateId = function () {
+    return Math.floor(Math.random() * 10000);
+};

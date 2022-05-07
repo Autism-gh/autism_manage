@@ -1,6 +1,7 @@
 import defaultSettings from '@/setting'
 
 const {
+    showWife,
     showSettings,
     tagsView,
     fixedHeader,
@@ -8,6 +9,7 @@ const {
 } = defaultSettings
 
 const state = {
+    showWife: showWife,
     showSettings: showSettings,
     tagsView: tagsView,
     fixedHeader: fixedHeader,

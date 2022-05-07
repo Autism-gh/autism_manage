@@ -1,5 +1,5 @@
 <template>
-    <div class="waifu">
+    <div class="waifu" v-show="showWife">
 
         <!-- 提示框 -->
         <div class="waifu-tips">
@@ -26,19 +26,18 @@ export default {
     },
 
     computed: {
-        ...mapState('wife', ['modelId', 'wifemessage'])
+        ...mapState('wife', ['modelId', 'wifemessage']),
+
+        ...mapState('settings', ['showWife'])
     },
 
     watch: {
-        // this.$store.commit('wife/setCurrentState', { key: 'modelId', value: radoModelId })
         modelId(newVal) {
             this.changeWifeClothes()
         }  
     },
 
     mounted() { 
-        console.log('loadlive2d', loadlive2d)
-
         if(!loadlive2d) {
             this.$warning('live2d 加载失败')
             return
@@ -50,7 +49,6 @@ export default {
     methods: {
         async changeWifeClothes(modelId = null) {
             let radoModelId = modelId || Math.ceil(Math.random() * 87);
-            // 随时换皮肤哦 由于改成直接调取，所以请求的这个速度啊，刚刚的！
             await this.$nextTick()
             loadlive2d("live2d", `/wife/model/index${ radoModelId }.json`);
         },

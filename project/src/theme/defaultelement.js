@@ -53,6 +53,10 @@ export const extandVariables = {
     '--background-color-modal': '#2e2e2e',
 
 
+    // 主体
+    '--app-main': '#f6f6f6',
+
+
     // 菜单
     '--menu-text': '#bfcbd9',
     '--menu-active-text': '#409EFF',

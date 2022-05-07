@@ -4,7 +4,11 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+// 验证用户操作路由
 import './checkuser'
+
+// 开启日志监控
+import '@/util/app/error.log.js'
 
 import './property'
 

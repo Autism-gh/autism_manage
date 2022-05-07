@@ -23,8 +23,8 @@
                 
                 <template v-slot:dropdown>
                     <el-dropdown-menu >
-                        <el-dropdown-item @click="changeSettingSwitch">
-                            系统设置
+                        <el-dropdown-item>
+                            个人中心
                         </el-dropdown-item>
                         <el-dropdown-item divided @click.native="logout">
                             退出登入
@@ -33,6 +33,10 @@
                 </template>
 
             </el-dropdown>
+
+            <div class="setting-container" @click="handleOpenSettingSide">
+                <i class="el-icon-setting"></i>
+            </div>
         </div>
 
     </div>
@@ -65,7 +69,7 @@
                 this.$router.push(`/login?redirect=${this.$route.fullPath}`)
             },
 
-            changeSettingSwitch() {
+            handleOpenSettingSide() {
                 this.$store.dispatch('settings/switchChange')
             }
         }
@@ -106,6 +110,8 @@
             float: right;
             height: 100%;
             line-height: 50px;
+            display: flex;
+            align-items: center;
 
             &:focus {
                 outline: none;
@@ -155,6 +161,21 @@
                     }
                 }
             }
+
+            .setting-container {
+                height: 100%;
+                width: 40px;
+                border-top-left-radius: 50%;
+                border-bottom-left-radius: 50%;
+                background-color: var(--menu-bg);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                color: var(--color-white);
+                cursor: pointer;
+            }
+
         }
     }
 </style>

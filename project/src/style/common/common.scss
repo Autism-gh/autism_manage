@@ -38,3 +38,22 @@ $modifier-separator: '--';
         align-items: center;
     }
 }
+
+
+@include b(font) {
+    @include m(12) {
+        font-size: 12px;
+    }
+    @include m(14) {
+        font-size: 14px;
+    }
+    @include m(16) {
+        font-size: 16px;
+    }
+    @include m(18) {
+        font-size: 18px;
+    }
+    @include m(20) {
+        font-size: 20px;
+    }
+}
