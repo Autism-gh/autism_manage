@@ -303,7 +303,7 @@
                     this.reSetPromiseInit()
                     // 好像会串数据走深拷贝 后面再看看
                     if(value && value.length) {
-                        this.tree.dataArray = [...value]
+                        this.tree.dataArray = JSON.parse(JSON.stringify(value))
                     } else {
                         this.tree.dataArray = []
                     }
