@@ -5,6 +5,9 @@
  */
  const basic = {
     '--color-primary': '#ff7940',
+
+    // 滚动条
+    '--scrollbar-background-color':'#E4E7ED'
 }
 
 

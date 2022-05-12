@@ -14,6 +14,9 @@ export function isNumber(obj) {
     return Object.prototype.toString.call(obj) === '[object Number]';
 }
 
+export function isBoolean(obj) {
+    return Object.prototype.toString.call(obj) === '[object Boolean]';
+}
 
 export const isFunction = (functionToCheck) => {
     var getType = {};

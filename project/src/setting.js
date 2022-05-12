@@ -7,7 +7,7 @@ module.exports = {
      * @description 显示左下角吉祥物
      * 
      */
-    showWife: true,
+    showWife: false,
   
     /**
      * @type {boolean} true | false

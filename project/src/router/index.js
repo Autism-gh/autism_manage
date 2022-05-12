@@ -71,6 +71,7 @@ export const constantRoutes = [
 
 
 /* Router Modules */
+import assemblyRouter from './modules/assembly'
 import bussinessRouter from './modules/bussiness'
 import mapRouter from './modules/map'
 import reportRouter from './modules/report'
@@ -87,6 +88,7 @@ import systemRouter from './modules/system'
  * 
  */
 export const asyncRoutes = [
+    assemblyRouter,
     bussinessRouter,
     mapRouter,
     reportRouter,

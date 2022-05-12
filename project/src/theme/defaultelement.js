@@ -68,5 +68,9 @@ export const extandVariables = {
     '--sub-menu-bg': '#1f2d3d',
     '--sub-menu-hover': '#001528',
 
-    '--side-bar-width': '210px'
+    '--side-bar-width': '210px',
+
+
+    // 间距，间隔
+    '--default-padding': '8px'
 }
