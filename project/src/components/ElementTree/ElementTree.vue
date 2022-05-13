@@ -1,6 +1,5 @@
 <template>
-    <div class="tree-container">
-
+    <div class="tree-container" v-loading="tree.loading">
 
         <div class="header-wrapper">
             <el-select v-model="query.value" :placeholder="placeholder" filterable remote :clearable="false"
@@ -9,8 +8,9 @@
                 <el-option v-for="item in query.filterList" :key="item[nodeOptions.id]"
                     :label="item[nodeOptions.label]" :value="item[nodeOptions.id]" />
             </el-select>
-        </div>
 
+            <i class="tree-search-icon el-icon-search"></i>
+        </div>
 
         <div class="content-wrapper" ref="treeWrap">
             <ElTree
@@ -58,6 +58,7 @@
 </template>
 
 <script>
+    import ElTree from './ElTree/tree.vue'
     import * as TreeUtil from './treeUtil'
     import { timeSleep } from '@/util/common/common'
     import { mapActions } from 'vuex'
@@ -65,7 +66,7 @@
     import _ from 'lodash'
     
     export default {
-        components: {},
+        components: { ElTree },
         props: {
             defaultChecked: {
                 type: Array,
@@ -208,9 +209,19 @@
              * 有哪些特别的节点是可以通过点击展开的
              * 
              */
-            nodeExpandByClick: {
+            idCanExpandByClick: {
                 type: Array,
                 default: () => []
+            },
+
+            /**
+             * 
+             * 触碰显示详情
+             * 
+             */
+            treeNodeHover: {
+                type: [Boolean, Array],
+                default: false
             }
             
         },
@@ -304,6 +315,7 @@
                     // 好像会串数据走深拷贝 后面再看看
                     if(value && value.length) {
                         this.tree.dataArray = JSON.parse(JSON.stringify(value))
+                        // this.tree.dataArray = [...value]
                     } else {
                         this.tree.dataArray = []
                     }
@@ -331,6 +343,10 @@
                 $tree.setCurrentKey(value)
                 node.expand(null, true)
             },
+
+            checkMode(newVal) {
+                this.clearChecked()
+            }
         },
 
         methods: {
@@ -340,6 +356,7 @@
 
             reSetPromiseInit(type = true) {
                 try {
+                    this.tree.loading = true
                     if (this.waitForInit) {
                         this.promiseResolve(`数据刷新清空回调`)
                         this.waitForInit = null
@@ -355,7 +372,7 @@
                 }
             },
 
-            handleOverInit(list = null) {
+            async handleOverInit(list = null) {
                 this.handleInitCustom()
                 const $tree = this.$refs['tree']
                 // 双验证
@@ -375,6 +392,9 @@
                     firstNode: firstNode
                 })
                 this.promiseResolve('yes')
+                await this.$nextTick()
+                // await timeSleep(2000)
+                this.tree.loading = false
             },
             
             
@@ -382,6 +402,7 @@
                 const $tree = this.$refs['tree']
                 // 默认高亮
                 if (this.defaultSelect) {
+                    this.expandByNodeId(this.defaultSelect)
                     $tree.setCurrentKey(this.defaultSelect)
                 }
 
@@ -389,9 +410,12 @@
                     if (this.checkMode === 'checkbox') {
                         $tree.setCheckedKeys(this.defaultChecked)
                     }
+
                     if (this.checkMode === 'radio') {
-                        $tree.setChecked(this.defaultChecked[0], true, false)
-                        $tree.setCurrentKey(this.defaultChecked[0])
+                        const checkId = this.defaultChecked[0]
+                        this.expandByNodeId(checkId)
+                        $tree.setChecked(checkId, true, false)
+                        $tree.setCurrentKey(checkId)
                     }
                 }
             },
@@ -422,15 +446,21 @@
              * 常用的方法
              * 
              */
-            setChecked(node, checkState) {
+            clearChecked() {
                 const $tree = this.$refs['tree']
-                $tree.setCheckedKeys(node, checkState)
+                $tree.setCheckedKeys([]);
+            },  
+
+            setCheckedNodes(node) {
+                const $tree = this.$refs['tree']
+                $tree.setCheckedNodes(node)
+                this.handleNodeCheck({}, this.getTreeCurrentState(), null)
             },
             
             setCheckedKeys(keys) {
                 const $tree = this.$refs['tree']
-                $tree.setCheckedKeys(keys, true)
-                this.$emit('node-check', {}, this.getTreeCurrentState())
+                $tree.setCheckedKeys(keys)
+                this.handleNodeCheck({}, this.getTreeCurrentState(), null)
             },
 
             getNode(key) {
@@ -443,6 +473,29 @@
                 $tree.setCurrentKey(key)
             },
 
+
+            /**
+             * 展开指定元素
+             */
+            expandByNode(node) {
+                if (!node) return
+                if (node?.parent) {
+                    this.expandByNode(node.parent)
+                }
+                if (!node.expanded) {
+                    node.expand()
+                }
+            },
+
+            /**
+             * 根据ID 展开
+             */
+            expandByNodeId(nodeId) {
+                if (!nodeId) return
+                const $tree = this.$refs['tree']
+                const node = $tree.getNode(nodeId)
+                this.expandByNode(node)
+            },
 
 
             /**
@@ -458,7 +511,6 @@
             },
 
             async handleNodeCheck(data, node, $node) {
-                await this.$nextTick()
                 this.$emit('node-check', data, node)
             },
 
@@ -467,22 +519,24 @@
                     if (this.dblickEvent) {
                         clearTimeout(this.dblickEvent)
                         this.dblickEvent = undefined
-                        this.$emit('node-dbl-click', data, node, $node)
+                        this.$emit('node-double-click', data, node)
                     } else {
                         this.dblickEvent = setTimeout(() => {
                             this.dblickEvent = undefined
                         }, 300)
                     }
                 } else {
-                    if (!this.nodeExpandByClick.length) return
-                    const levelValue = data[this.nodeOptions.level]
-                    if (levelValue && this.nodeExpandByClick.includes(levelValue)) {
-                        if (node.expanded) {
-                            node.collapse()
-                        } else {
-                            node.expand()
+                    if(this.idCanExpandByClick.length) {
+                        const levelValue = data[this.nodeOptions.level]
+                        if (levelValue && this.idCanExpandByClick.includes(levelValue)) {
+                            if (node.expanded) {
+                                node.collapse()
+                            } else {
+                                node.expand()
+                            }
                         }
                     }
+                    this.$emit('node-simple-click', data, node)
                 }
             },
 
@@ -560,11 +614,12 @@
                 }
             },
 
+
             scrollToRightView: _.debounce(async function(nodeId = null) {
                 const $tree = this.$refs['tree']
                 if (nodeId) {
                     $tree.setCurrentKey(nodeId)
-                    this.expandCurrentNodes($tree.store.nodesMap[nodeId])
+                    this.expandByNode($tree.store.nodesMap[nodeId])
                     await this.$nextTick()
                     /**
                      * 
@@ -600,23 +655,33 @@
 
 <style lang="scss" scoped>
 .tree-container {
+    position: relative;
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
 
     .header-wrapper {
-        padding: 10px;
+        position: relative;
+        padding: var(--default-padding);
 
         .el-select {
             width: 100%;
+        }
+
+        .tree-search-icon {
+            position: absolute;
+            right: 20px;
+            top: 16px;
+            font-size: 16px;
+            color: var(--color-text-secondary);
         }
     }   
     
     .content-wrapper {
         flex-grow: 1;
         overflow: auto;
-        margin: 0 10px;
+        margin: 0 var(--default-padding);
     }
 
     .elementTree-tree-row {

@@ -12,6 +12,40 @@
         display: flex;
         flex-wrap: wrap;
         padding: 0 var(--default-padding) 0 var(--default-padding);
+
+        /deep/ .filter-item {
+            display: flex;
+            align-items: center;
+
+            .title {
+                padding-right: var(--default-padding);
+            }
+
+            .control {
+                width: calc(100% - 100px);
+                flex-grow: 1;
+            }
+
+            + .filter-item {
+                margin-left: var(--default-padding);
+            }
+
+            &:last-of-type {
+                margin-right: var(--default-padding);
+            }
+
+            &.mr {
+                margin-right: var(--default-padding);
+            }
+            &.ml {
+                margin-left: var(--default-padding);
+            }
+        }
+
+        .filter-left {
+            display: flex;
+            align-items: center;
+        }
         
         .first-floor {
             width: 100%;

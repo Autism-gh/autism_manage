@@ -11,12 +11,21 @@ const assemblyRouter = {
         title: '组件',
         icon: 'el-icon-star-off'
     },
-    children: [{
+    children: [
+        {
             path: 'treedemo',
             component: () => import('@/page/assembly/TreeDemo'),
             name: 'TreeDemo',
             meta: {
-                title: 'ElementTree'
+                title: 'ElementTree 示例'
+            }
+        },
+        {
+            path: 'TreeMethods',
+            component: () => import('@/page/assembly/TreeMethods'),
+            name: 'TreeMethods',
+            meta: {
+                title: 'ElementTree 用法'
             }
         }
     ]

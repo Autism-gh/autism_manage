@@ -61,7 +61,6 @@ export const listToTree = (list, rules = treeNodeOptions['default'], showRules =
 
         // 拿到这个级别的key
         const levelKey = item[level]
-        const idKey = item[id]
 
         let levelRule = {}
         // 存在特殊规则在里面
@@ -69,7 +68,7 @@ export const listToTree = (list, rules = treeNodeOptions['default'], showRules =
             levelRule = showRules[levelKey]
         }
 
-        const { showNode, showCheckbox } = levelRule
+        const { showNode, showCheckbox, disabled } = levelRule
         
         // 把那些配置成不显示的的节点直接搞下去
         if (!isBoolean(showNode)) {
@@ -77,8 +76,9 @@ export const listToTree = (list, rules = treeNodeOptions['default'], showRules =
             Object.assign(item, {
                 // showCheckbox 控制是否显示
                 showCheckbox: showCheckbox === undefined,
-                // 那种不shoucheckBox 选中框将被禁用避免影响其他正常操作
-                disabled: showCheckbox !== undefined
+
+                // 那种不showcheckBox 选中框将被禁用避免影响其他正常操作
+                disabled: disabled
             })
 
             map[item[id]] = item

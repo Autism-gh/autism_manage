@@ -72,5 +72,5 @@ export const extandVariables = {
 
 
     // 间距，间隔
-    '--default-padding': '8px'
+    '--default-padding': '10px'
 }

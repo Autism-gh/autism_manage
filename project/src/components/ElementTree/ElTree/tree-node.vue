@@ -78,14 +78,21 @@
 
 <script type="text/jsx">
 
-/**
- * 【DIFFERENT FORM NORMAL】
- *  与环境内引入得冲突，注销
- */
-//   import ElCollapseTransition from 'element-ui/src/transitions/collapse-transition';
+  /**
+   * 【DIFFERENT FORM NORMAL】
+   *  与环境内引入得冲突，注销
+   */
+  //   import ElCollapseTransition from 'element-ui/src/transitions/collapse-transition';
+  import { getNodeKey } from 'element-ui/packages/tree/src/model/util';
+  /**
+   * END
+   */
+  
   import ElCheckbox from 'element-ui/packages/checkbox';
   import emitter from 'element-ui/src/mixins/emitter';
-  import { getNodeKey } from './model/util';
+
+  
+  
 
   export default {
     name: 'ElTreeNode',

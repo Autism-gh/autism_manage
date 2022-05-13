@@ -31,8 +31,16 @@
 </template>
 
 <script>
-  import TreeStore from './model/tree-store';
-  import { getNodeKey, findNearestComponent } from './model/util';
+  /**
+   * 【DIFFERENT FORM NORMAL】
+   *  与环境内引入得冲突，注销
+   */
+  import TreeStore from 'element-ui/packages/tree/src/model/tree-store';
+  import { getNodeKey, findNearestComponent } from 'element-ui/packages/tree/src/model/util';
+  /**
+   * END
+   */
+
   import ElTreeNode from './tree-node.vue';
   import {t} from 'element-ui/src/locale';
   import emitter from 'element-ui/src/mixins/emitter';
