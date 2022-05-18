@@ -21,7 +21,7 @@
             <div v-if="!asyncCommit" class="selectTree__fotter">
                 <span class="font--12 text--brand">
                     <span v-if="haveCheckBox">
-                        {{ selectTree.checked.length }} / {{ select.rootNumber }}
+                        {{ foramtSelectNumber }} / {{ select.rootNumber }}
                     </span>
                 </span>
                 <span>
@@ -42,7 +42,7 @@
     export default {
         model: {
             prop: 'chooseValue',
-            event: 'change'
+            event: 'modify'
         },
 
         components: {
@@ -144,10 +144,8 @@
 
 
                 selectTree: {
-                    // 选中的节点数据（多）
-                    checked: [],
-                    // 可以选择的数据的数量
-                    clicked: {},
+                    handleNode: null,
+
                     // 高亮选中的数据
                     heightLightId: ''
                 },
@@ -159,7 +157,9 @@
             };
         },
         watch: {
-            
+            chooseValue() {
+                this.setInputValue()
+            }
         },
         computed: {
             checkMode() {
@@ -170,6 +170,12 @@
                 return this.checkMode !== 'nocheck'
             },
 
+            foramtSelectNumber() {
+                const { handleNode } = this.selectTree
+                const { nodeOptions: { label } } = this.select
+                return Array.isArray(handleNode) ? handleNode?.length : handleNode[label]
+            },
+
             formatTreeStyle() {
                 const { treeHeight, treeWidth } = this
                 const height =  `height: ${ isString(treeHeight) ? treeHeight : `${ treeHeight }px` }`
@@ -178,67 +184,77 @@
 
 
             formatSelectValue() {
-                const { checked, clicked } = this.selectTree
+                const { handleNode } = this.selectTree
                 const { rootNumber, nodeOptions } = this.select
-                const number = checked?.length || 0
-                if (number) {
-                    const text = number === rootNumber ? '全部' : ''
-                    return `已选择${text}${number}${this.selectText}`
+
+                if(this.checkMode === 'checkbox') {
+                    const number = handleNode?.length || 0
+                    const text = number === rootNumber  ? '全部' : ''
+                    return number ? `已选择${text}${number}${this.selectText}` : ''
                 } else {
-                    return clicked ? clicked[nodeOptions.label] || '' : ''
+                    const formatData = Array.isArray(handleNode) ? handleNode[0] : handleNode
+                    return formatData ? formatData[nodeOptions?.label] || '' : ''
                 }
             }
         },
         methods: {
+            /**
+             * 
+             * 
+             * 存在一个问题。当这个组件进行首次赋值，BUT ！ 未改变，那么我就无法 做移入移出 了
+             * 
+             * 做一个 ID 匹配了只能
+             * 
+             */
             async setInputValue() {
                 const $tree = this.$refs['selectTreeRef']
-                
                 if(isEmpty(this.chooseValue)) {
                     // 清空选中和高亮
                     $tree.clearChecked()
                     $tree.clearCurrent()
+                    
+                    this.selectTree.handleNode = null
                     return
                 }
 
                 const { nodeOptions, treeData } = this.select
                 const { id: ruleId } = nodeOptions
 
-                console.log('this.chooseValue', this.chooseValue)
-
                 let heightLight
-                // 有框的选中
+                // 有框的选中(包含单选多选)
                 if(this.haveCheckBox) {
                     let checkedKeys
+                    const formatValue = Array.isArray(this.chooseValue) ? this.chooseValue : [this.chooseValue]
+                    const firstData =  formatValue[0]
+                    const isTreeId = isString(firstData)
 
-                    // ruleId 是树配置的 id 是通过 setCheckedKeys 去选中的方式，你可以要其他数据，但是不能少了它！
-                    if(isString(this.useKey) && this.useKey !== 'all' && this.useKey === ruleId) {
-                        this.selectTree.clicked = treeData.find(item => item[ruleId] === this.chooseValue)
-                        checkedKeys = [this.chooseValue]
-                        heightLight = this.chooseValue
-                    } else {
-                        this.selectTree.checked = treeData.filter(item => this.chooseValue.includes(item[ruleId]))
-                        checkedKeys = this.chooseValue.map(item => item[ruleId])
+                    // 选中的idlist
+                    checkedKeys = isTreeId ? formatValue : formatValue.map(item => item[ruleId])
+                    this.selectTree.handleNode = treeData.filter(item => checkedKeys.includes(item[ruleId]))
+
+                    // 只有一个选中的时候高亮它！
+                    if(formatValue?.length === 1) {
+                        heightLight = isTreeId ? firstData : firstData[ruleId]
                     }
-
-                    console.log('checkedKeys', checkedKeys)
-                    $tree.setCheckedKeys(checkedKeys)
+                    checkedKeys?.length && $tree.setCheckedKeys(checkedKeys)
                 } else {
-                    heightLight = this.chooseValue
+                    heightLight = isString(this.chooseValue) ? this.chooseValue : this.chooseValue[ruleId]
+                    this.selectTree.handleNode = treeData.find(item => item[ruleId] === heightLight)
                 }
 
                 const currentNode = $tree.getNode(heightLight)
                 currentNode && currentNode.expand(null, true);
-                $tree.setCurrentKey(currentNode)
+                currentNode && $tree.setCurrentKey(currentNode)
             },
 
 
             async handleClick(data, node) {
                 // 不是选中模式的点击事件不作为
-                if (this.checkMode === 'checkbox') return
-                this.selectTree.clicked = data
+                if (this.haveCheckBox) return
+                this.selectTree.handleNode = data
                 
                 if(this.asyncCommit) {
-                    this.handleEmitValue(data)
+                    this.handleEmitValue()
                     await this.$nextTick()
                     if (this.checkMode !== 'checkbox') {
                         this.cancleSelect()
@@ -248,18 +264,17 @@
 
 
             async handleChecked(data, node) {
+                // console.log('handleChecked', data)
+
                 if(!node) return
                 if (this.checkMode === 'radio') {
-                    this.selectTree.clicked = node.checkedNodes[0]
+                    this.selectTree.handleNode = node.checkedNodes
                 } else {
-                    this.selectTree.checked = this.handleCanSelectList(node.checkedNodes)
+                    this.selectTree.handleNode = this.handleCanSelectList(node.checkedNodes)
                 }
 
                 if(this.asyncCommit) {
-                    const { checked, clicked } = this.selectTree
-                    const handleData = this.checkMode === 'radio' ? clicked : checked
-
-                    this.handleEmitValue(handleData)
+                    this.handleEmitValue()
                     await this.$nextTick()
 
                     if (this.checkMode !== 'checkbox') {
@@ -270,30 +285,40 @@
 
 
             handleEmitValue(data) {
+                const { handleNode } = this.selectTree
                 let formatResult = {}
-                // 需要node 中的多种数据
-                const arrayType = Array.isArray(this.useKey)
 
-                if(isEmpty(data)) {
-                    formatResult = Array.isArray(data) ? [] : null
+                const { nodeOptions: { id: ruleId } } = this.select
+
+                // 需要node 中的多种数据
+                const keyRules = isEmpty(this.useKey) ? ruleId : this.useKey
+                const arrayType = Array.isArray(keyRules)
+
+                let formatData = deepClone(handleNode)
+                if(this.checkMode === 'radio') {
+                    formatData = formatData[0]
+                }
+
+                if(isEmpty(formatData)) {
+                    formatResult = Array.isArray(formatData) ? [] : null
                 } else {
-                    if(this.useKey === 'all') {
-                        formatResult = deepClone(data)
+                    if(keyRules === 'all') {
+                        formatResult = formatData
                     } else {
 
                         // 数据多选的情况
-                        if(Array.isArray(data)) {
+                        if(Array.isArray(formatData)) {
                             
                             if (arrayType) {
-                                formatResult = data.map(item => {
+                                formatResult = formatData.map(item => {
                                     const obj = {}
-                                    this.useKey.forEach(key => {
+                                    keyRules.forEach(key => {
                                         obj[key] = item[key]
                                     })
                                     return obj
                                 })
                             } else {
-                                formatResult = data.map(item => item[this.useKey])
+                                formatResult = formatData.map(item => item[keyRules])
                             }
                         }
                         // 数据单选选择的情况
@@ -301,19 +326,19 @@
                         {
                             if (arrayType) {
                                 const obj = {}
-                                this.useKey.forEach(key => {
-                                    obj[key] = data[key]
+                                keyRules.forEach(key => {
+                                    obj[key] = formatData[key]
                                 })
                                 formatResult = obj
                             } else {
-                                formatResult = data[this.useKey]
+                                formatResult = formatData[keyRules]
                             }
                         }
                     }
                 }
 
                 // this.$emit('update:chooseValue', formatResult)
-                this.$emit('change', formatResult)
+                this.$emit('modify', formatResult)
             },
 
 
@@ -340,29 +365,26 @@
             getCommitSelect() {
                 let result
                 const { nodeOptions } = this.select
-                const { checked, clicked } = this.selectTree
+                const { handleNode } = this.selectTree
                 const { id: ruleId } = nodeOptions
 
-                if (this.checkMode === 'checkbox') {
-                    const keyList = checked.map(item => item[ruleId])
+
+                if (Array.isArray(handleNode)) {
+                    const keyList = handleNode.map(item => item[ruleId])
                     result = {
+                        isEmpty: !handleNode.length,
                         keyList: keyList,
-                        nodeList: checked
+                        nodeList: handleNode
                     }
                 } else {
                     result = {
-                        key: clicked[ruleId],
-                        node: clicked
+                        isEmpty: JSON.stringify(handleNode) === '{}',
+                        key: handleNode[ruleId],
+                        node: handleNode
                     }
                 }
                 return result
             },
-
-
-
-
-
-
 
 
 
@@ -425,8 +447,12 @@
             this.reSetPromiseInit()
         },
         mounted() {
-            console.log('giao')
+            
         },  
+
+        activated () {
+            
+        },
 
         beforeDestroy() {
             this.reSetPromiseInit(false)

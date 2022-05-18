@@ -121,10 +121,9 @@
                 },
 
                 dialogTree: {
-                    // 选中的节点数据（多）
-                    checked: [],
-                    // 可以选择的数据的数量
-                    clicked: {}
+                    handleNode: null,
+
+                    heightLight: ''
                 },
 
                 waitForInit: null,
@@ -166,9 +165,13 @@
         },
         methods: {
             async handleTreeAfterInit($tree, { treeList, nodeOptions }) {
-                if (!treeList || !treeList.length) return
+                if (!treeList || !treeList.length) {
+                    this.modal.loading = false
+                    return
+                }
                 this.modal.nodeOptions = deepClone(nodeOptions)
                 this.modal.treeData = deepClone(treeList)
+                this.modal.loading = false
                 this.promiseResolve({ state: true, message: 'OK' })
             },
 
@@ -195,18 +198,12 @@
                 if(parmasId) {
                     // 选中框模式
                     if(this.haveCheckBox) {
-                        let needChecked = []
-                        if (Array.isArray(parmasId)) {
-                            needChecked = parmasId
-                            this.dialogTree.checked = treeData.filter(item => needChecked.includes(item[ruleId]))
-                        } else {
-                            needChecked = [parmasId]
-                            this.dialogTree.checked = treeData.filter(item => needChecked.includes(item[ruleId]))
-                        }
+                        let needChecked = Array.isArray(parmasId) ? parmasId : [parmasId]
+                        this.dialogTree.handleNode = treeData.filter(item => needChecked.includes(item[ruleId]))
                         heightLightId = needChecked[0]
                         $tree.setCheckedKeys(needChecked)
                     } else {
-                        this.dialogTree.clicked = treeData.find(item => item[ruleId] === parmasId)
+                        this.dialogTree.handleNode = treeData.find(item => item[ruleId] === parmasId)
                     }
                 }
 
@@ -230,21 +227,21 @@
             getCommitSelect() {
                 let result
                 const { nodeOptions } = this.modal
-                const { checked, clicked } = this.dialogTree
+                const { handleNode } = this.dialogTree
                 const { id: ruleId } = nodeOptions
-
-                if (this.checkMode === 'checkbox') {
-                    const keyList = checked.map(item => item[ruleId])
+                
+                if (Array.isArray(handleNode)) {
+                    const keyList = handleNode.map(item => item[ruleId])
                     result = {
-                        isEmpty: checked.length < 1,
+                        isEmpty: !handleNode.length,
                         keyList: keyList,
-                        nodeList: checked
+                        nodeList: handleNode
                     }
                 } else {
                     result = {
-                        isEmpty: JSON.stringify(clicked) === '{}',
-                        key: clicked[ruleId],
-                        node: clicked
+                        isEmpty: JSON.stringify(handleNode) === '{}',
+                        key: handleNode[ruleId],
+                        node: handleNode
                     }
                 }
                 return result
@@ -255,14 +252,11 @@
                 const result = this.getCommitSelect()
                 const { isEmpty } = result
 
-                console.log('isEmpty', isEmpty)
-
                 if(this.mandatory && isEmpty) {
                     this.$warning('必须选择一项！')
                     return
                 }
 
-                console.log('过来了？')
                 if (this.commitWay === 'sync') {
                     if (this.resultResolve) {
                         this.resultResolve(result)
@@ -277,15 +271,15 @@
             handleClick(data, node) {
                 // 不是选中模式的点击事件不作为
                 if (this.haveCheckBox) return
-                this.dialogTree.clicked = data
+                this.dialogTree.handleNode = data
             },
 
 
             handleChecked(data, node) {
                 if (this.checkMode === 'radio') {
-                    this.dialogTree.clicked = node.checkedNodes[0]
+                    this.dialogTree.handleNode = node.checkedNodes
                 } else {
-                    this.dialogTree.checked = this.handleCanSelectList(node.checkedNodes)
+                    this.dialogTree.handleNode = this.handleCanSelectList(node.checkedNodes)
                 }
             },
 

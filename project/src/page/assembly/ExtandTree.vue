@@ -2,11 +2,13 @@
     <div class="dialogTree-container">
 
         <div class="dialogTree-item">
-            <el-button type="primary" @click="handleOpenModal">打开同步弹框树</el-button>
+            <el-button type="primary" @click="handleOpenModal('checkbox')">打开同步多选弹框树</el-button>
+            <el-button type="primary" @click="handleOpenModal('radio')">打开同步单选弹框树</el-button>
             <div class="message">同步取值，调用方法直接打开 / 传递值， 不用来回搞事件传递，配置好东西就可以直接通过方法内获取想要的数据</div>
         </div>
         <DialogTree 
             ref="dialogTree" 
+            :checkMode="dialogTreeModel"
             treeSign="vehicleModel"
             :mandatory="mandatory">
         </DialogTree>
@@ -55,7 +57,7 @@
                 </SelectTree>
             </div>
             <div class="right-wrapper">
-                <el-button type="primary" @click="handleOpenFormModal('siyu')">模拟给【单选】添加默认值并打开弹框</el-button>
+                <el-button type="primary" @click="handleOpenFormModal('vehicle')">模拟给【单选】添加默认值并打开弹框</el-button>
             </div>
         </div>
 
@@ -90,7 +92,7 @@
                 </SelectTree>
             </div>
             <div class="right-wrapper">
-                <el-button type="primary" @click="handleOpenFormModal(['siyu', 'yage'])">模拟给【多选】添加默认值并打开弹框</el-button>
+                <el-button type="primary" @click="handleOpenFormModal('vehicleList')">模拟给【多选】添加默认值并打开弹框</el-button>
             </div>
         </div>
         
@@ -110,6 +112,7 @@
                 </el-form-item>
                 <el-form-item label="车型">
                     <SelectTree 
+                        ref="selectTree1"
                         v-model="modal.data.vehicle" 
                         checkMode="radio" 
                         treeSign="vehicleModel" 
@@ -118,6 +121,7 @@
                 </el-form-item>
                 <el-form-item label="哪些车">
                     <SelectTree 
+                        ref="selectTree2"
                         v-model="modal.data.vehicleList"
                         treeSign="vehicleModel" 
                         asyncCommit>
@@ -127,7 +131,7 @@
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="modal.show = false">取 消</el-button>
-                <el-button type="primary" @click="modal.show = false">确 定</el-button>
+                <el-button type="primary" @click="handleCommit">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -145,8 +149,17 @@
         props: {},
         name: 'ExtandTree',
         data() {
+            const defaultData = {
+                name: '',
+                age: '',
+                vehicle: '',
+                vehicleList: []
+            }
+
             return {
                 treeDialog: false,
+
+                dialogTreeModel: 'radio',
 
                 nodeShowRules: {
                     first: {
@@ -180,15 +193,8 @@
                 modal: {
                     show: false,
 
-                    data: {
-                        name: '',
-
-                        age: '',
-
-                        vehicle: '',
-
-                        vehicleList: []
-                    }
+                    defaultData,
+                    data: JSON.parse(JSON.stringify(defaultData))
                 }
             };
         },
@@ -199,18 +205,50 @@
 
         },
         methods: {
-
-            async handleOpenFormModal(parmas) {
+            
+            /**
+             * 
+             * 传值的方式如下
+             * 
+             * 如果是普通情况的 就 ['id'] 即可
+             * 
+             * 也可以是 但是注意啊，这个id 必须和树上你想要的那个 id 名字一样 ，就是唯一值！！！！如果是
+             * [
+             *  { id: '', type: '' },
+             *  { id: '', type: '' },
+             *  { id: '', type: '' }
+             * ]
+             * 
+             */
+            async handleOpenFormModal(type) {
                 this.modal.show = true
+                this.modal.data = JSON.parse(JSON.stringify(this.modal.defaultData))
                 await this.$nextTick()
-                
-                if(Array.isArray(parmas)) {
+
+                //  多选情况如下
+                if(type === 'vehicleList') {
+                    const mockData = ['siyu', 'yage', 'xuefulan']
+                    // const mockData = [
+                    //     { id: 'siyu', a: '', b: '' },
+                    //     { id: 'yage', a: '', b: '' },
+                    //     { id: 'xuefulan', a: '', b: '' },
+                    // ]
+
                     Object.assign(this.modal.data, {
-                        vehicleList: parmas
+                        vehicleList: mockData,
+                        vehicle: ''
                     })
-                } else {
+                }
+                
+                // 单选情况 甩他妈个 id 就行了！
+                else  {
+                    // const mockData = 'siyu'
+
+                    const mockData = { id: 'siyu', a: '' }
+                    
                     Object.assign(this.modal.data, {
-                        vehicle: parmas
+                        vehicle: mockData,
+                        vehicleList: []
                     })
                 }
             },
@@ -220,15 +258,24 @@
              * 同步形式获取需要的数据
              * 
              */
-            async handleOpenModal() {
+            async handleOpenModal(type) {
+                this.dialogTreeModel = type
+                await this.$nextTick()
+                const parmas = type === 'radio' ? ['siyu'] : ['siyu', 'yage']
                 const $dialogTree = this.$refs['dialogTree']
-                const result = await $dialogTree.initDialogTreeData('siyu')
+                const result = await $dialogTree.initDialogTreeData(parmas)
                 console.log('【同步】获取弹框树的值', result)
             },
 
             handleTreeSelectChange(result) {
                 console.log('【异步】获取弹框树的值', result)
                 this.treeDialog = false
+            },
+
+
+            handleCommit() {
+                console.log('this.modal.data', this.modal.data)
+                this.modal.show = false
             }
         },
         created() {
