@@ -283,6 +283,7 @@
             .el-icon-close {
                 width: 16px;
                 height: 16px;
+                font-size: 16px;
                 vertical-align: 2px;
                 border-radius: 50%;
                 text-align: center;

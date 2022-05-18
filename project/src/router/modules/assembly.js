@@ -27,6 +27,14 @@ const assemblyRouter = {
             meta: {
                 title: 'ElementTree 用法'
             }
+        },
+        {
+            path: 'ExtandTree',
+            component: () => import('@/page/assembly/ExtandTree'),
+            name: 'ExtandTree',
+            meta: {
+                title: 'ExtandTree 示例'
+            }
         }
     ]
 }

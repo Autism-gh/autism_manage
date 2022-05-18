@@ -1,5 +1,7 @@
 <template>
-    <div>引导页</div>
+    <div>
+        只是闹着玩的
+    </div>
 </template>
 
 <script>

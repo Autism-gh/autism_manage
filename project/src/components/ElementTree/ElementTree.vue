@@ -252,12 +252,6 @@
             };
         },
 
-        provide() {
-            return {
-                treeArray: this.tree.dataArray
-            }
-        },
-
         computed: {
             checkHave() {
                 return !this.$scopedSlots.treeNode
@@ -358,7 +352,7 @@
                 try {
                     this.tree.loading = true
                     if (this.waitForInit) {
-                        this.promiseResolve(`数据刷新清空回调`)
+                        this.promiseResolve({ state: false, message: 'data refresh' })
                         this.waitForInit = null
                         this.promiseResolve = null
                     }
@@ -389,9 +383,10 @@
                 this.$emit('mounted', $tree, {
                     treeList: list || dataArray,
                     treeData: dataObject,
-                    firstNode: firstNode
+                    firstNode: firstNode,
+                    nodeOptions: this.nodeOptions
                 })
-                this.promiseResolve('yes')
+                this.promiseResolve({ state: true, message: 'OK' })
                 await this.$nextTick()
                 // await timeSleep(2000)
                 this.tree.loading = false
@@ -451,16 +446,25 @@
                 $tree.setCheckedKeys([]);
             },  
 
-            setCheckedNodes(node) {
+            clearCurrent() {
+                const $tree = this.$refs['tree']
+                $tree.setCurrentKey(null);
+            },
+
+            setCheckedNodes(node, async = false) {
                 const $tree = this.$refs['tree']
                 $tree.setCheckedNodes(node)
-                this.handleNodeCheck({}, this.getTreeCurrentState(), null)
+                if(async) {
+                    this.handleNodeCheck({}, this.getTreeCurrentState(), null)
+                }
             },
             
-            setCheckedKeys(keys) {
+            setCheckedKeys(keys, async = false) {
                 const $tree = this.$refs['tree']
                 $tree.setCheckedKeys(keys)
-                this.handleNodeCheck({}, this.getTreeCurrentState(), null)
+                if(async) {
+                    this.handleNodeCheck({}, this.getTreeCurrentState(), null)
+                }
             },
 
             getNode(key) {

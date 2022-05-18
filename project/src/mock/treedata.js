@@ -5,7 +5,7 @@ export const vehicleModel = [
     { name: '本田', id: 'bentian', parent: 'rixi', icon: 'el-icon-folder', level: 'third' },
     { name: '思域', id: 'siyu', parent: 'bentian', icon: 'el-icon-folder', level: 'fouth' },
     { name: '雅阁', id: 'yage', parent: 'bentian', icon: 'el-icon-folder', level: 'fouth' },
-    { name: 'C-RV', id: 'yingshipai', parent: 'bentian', icon: 'el-icon-folder', level: 'fouth' },
+    { name: 'C-RV', id: 'crv', parent: 'bentian', icon: 'el-icon-folder', level: 'fouth' },
 
     { name: '丰田', id: 'fengtian', parent: 'rixi', icon: 'el-icon-folder', level: 'third' },
     { name: '雷凌', id: 'leileng', parent: 'fengtian', icon: 'el-icon-folder', level: 'fouth' },
