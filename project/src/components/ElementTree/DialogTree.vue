@@ -233,12 +233,14 @@
                 if (Array.isArray(handleNode)) {
                     const keyList = handleNode.map(item => item[ruleId])
                     result = {
+                        state: true,
                         isEmpty: !handleNode.length,
                         keyList: keyList,
                         nodeList: handleNode
                     }
                 } else {
                     result = {
+                        state: true,
                         isEmpty: JSON.stringify(handleNode) === '{}',
                         key: handleNode[ruleId],
                         node: handleNode
