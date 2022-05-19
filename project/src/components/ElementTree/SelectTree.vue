@@ -36,9 +36,8 @@
 
 <script>
     import ElementTree from './ElementTree.vue'
-    import { deepClone } from '@/util/common/common'
+    import { deepClone, isEmpty } from '@/util/common/common'
     import { isString, isObject } from '@/util/common/type-check'
-    import { isEmpty } from '@/util/common/common'
     export default {
         model: {
             prop: 'chooseValue',
@@ -173,7 +172,7 @@
             foramtSelectNumber() {
                 const { handleNode } = this.selectTree
                 const { nodeOptions: { label } } = this.select
-                return Array.isArray(handleNode) ? handleNode?.length : handleNode[label]
+                return handleNode ? Array.isArray(handleNode) ? handleNode?.length : handleNode[label] : 0
             },
 
             formatTreeStyle() {
@@ -205,10 +204,13 @@
              * 
              * 做一个 ID 匹配了只能
              * 
+             * 外界也可以调用这个设置默认值
+             * 
              */
-            async setInputValue() {
+            async setInputValue(formatData = this.chooseValue) {
                 const $tree = this.$refs['selectTreeRef']
-                if(isEmpty(this.chooseValue)) {
+
+                if(isEmpty(formatData)) {
                     // 清空选中和高亮
                     $tree.clearChecked()
                     $tree.clearCurrent()
@@ -224,7 +226,7 @@
                 // 有框的选中(包含单选多选)
                 if(this.haveCheckBox) {
                     let checkedKeys
-                    const formatValue = Array.isArray(this.chooseValue) ? this.chooseValue : [this.chooseValue]
+                    const formatValue = Array.isArray(formatData) ? formatData : [formatData]
                     const firstData =  formatValue[0]
                     const isTreeId = isString(firstData)
 
@@ -238,7 +240,7 @@
                     }
                     checkedKeys?.length && $tree.setCheckedKeys(checkedKeys)
                 } else {
-                    heightLight = isString(this.chooseValue) ? this.chooseValue : this.chooseValue[ruleId]
+                    heightLight = isString(formatData) ? formatData : formatData[ruleId]
                     this.selectTree.handleNode = treeData.find(item => item[ruleId] === heightLight)
                 }
 
@@ -284,7 +286,28 @@
             },
 
 
-            handleEmitValue(data) {
+            handleEmitValue() {
+                const formatResult = this.getCommitSelect()
+                this.$emit('modify', formatResult)
+            },
+
+
+            cancleSelect() {
+                this.$refs['select'].blur()
+            },
+
+
+            commitSelect() {
+                const result = this.getCommitSelect()
+                this.$emit('change', result)
+                this.cancleSelect()
+            },
+
+
+            /**
+             * 外界手动获取目前选中 / 点击的单选的数据
+             */
+            getCommitSelect() {
                 const { handleNode } = this.selectTree
                 let formatResult = {}
 
@@ -336,54 +359,7 @@
                         }
                     }
                 }
-
-                // this.$emit('update:chooseValue', formatResult)
-                this.$emit('modify', formatResult)
-            },
-
-
-
-
-
-
-
-            cancleSelect() {
-                this.$refs['select'].blur()
-            },
-
-
-            commitSelect() {
-                const result = this.getCommitSelect()
-                this.$emit('change', result)
-                this.cancleSelect()
-            },
-
-
-            /**
-             * 外界手动获取目前选中 / 点击的单选的数据
-             */
-            getCommitSelect() {
-                let result
-                const { nodeOptions } = this.select
-                const { handleNode } = this.selectTree
-                const { id: ruleId } = nodeOptions
-
-
-                if (Array.isArray(handleNode)) {
-                    const keyList = handleNode.map(item => item[ruleId])
-                    result = {
-                        isEmpty: !handleNode.length,
-                        keyList: keyList,
-                        nodeList: handleNode
-                    }
-                } else {
-                    result = {
-                        isEmpty: JSON.stringify(handleNode) === '{}',
-                        key: handleNode[ruleId],
-                        node: handleNode
-                    }
-                }
-                return result
+                return formatResult
             },
 
 

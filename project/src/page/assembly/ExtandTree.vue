@@ -65,6 +65,39 @@
         <div class="dialogTree-item leftRight">
             <div class="left-wrapper">
                 <div class="setting-item">
+                    <div class="title">事件传递(多选)</div>
+                    <div class="control">
+                        {{ JSON.stringify(checkboxModelTreeAsync) }}
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="title">需要哪些字段？</div>
+                    <div class="control">
+                        <el-checkbox-group v-model="checkboxUseKeyAsync">
+                            <el-checkbox label="id"></el-checkbox>
+                            <el-checkbox label="parent"></el-checkbox>
+                            <el-checkbox label="level"></el-checkbox>
+                        </el-checkbox-group>
+                    </div>
+                </div>
+            </div>
+            <div class="center-wrapper">
+                <SelectTree 
+                    :useKey="checkboxUseKeyAsync"
+                    ref="selectTreecheckboxAync" 
+                    treeSign="vehicleModel"
+                    @change="handleSetValue">
+                </SelectTree>
+            </div>
+            <div class="right-wrapper">
+                <el-button type="primary" @click="setDefaultValue('selectTreecheckboxAync',['siyu', 'yage'])">设置思域为默认值</el-button>
+            </div>
+        </div>
+
+
+        <div class="dialogTree-item leftRight">
+            <div class="left-wrapper">
+                <div class="setting-item">
                     <div class="title">双向绑定的值(单选)</div>
                     <div class="control">
                         {{ JSON.stringify(radioModelTree) }}
@@ -93,6 +126,40 @@
             </div>
             <div class="right-wrapper">
                 <el-button type="primary" @click="handleOpenFormModal('vehicleList')">模拟给【多选】添加默认值并打开弹框</el-button>
+            </div>
+        </div>
+
+
+        <div class="dialogTree-item leftRight">
+            <div class="left-wrapper">
+                <div class="setting-item">
+                    <div class="title">事件传递(单选)</div>
+                    <div class="control">
+                        {{ JSON.stringify(radioModelTreeAsync) }}
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="title">需要哪些字段？</div>
+                    <div class="control">
+                        <el-checkbox-group v-model="radioUseKeyAsync">
+                            <el-checkbox label="id"></el-checkbox>
+                            <el-checkbox label="parent"></el-checkbox>
+                            <el-checkbox label="level"></el-checkbox>
+                        </el-checkbox-group>
+                    </div>
+                </div>
+            </div>
+            <div class="center-wrapper">
+                <SelectTree 
+                    ref="selectTreeradioAsync" 
+                    checkMode="radio" 
+                    treeSign="vehicleModel" 
+                    :useKey="radioUseKeyAsync"
+                    @change="handleSetRadioValue">
+                </SelectTree>
+            </div>
+            <div class="right-wrapper">
+                <el-button type="primary" @click="setDefaultValue('selectTreeradioAsync','siyu')">设置思域为默认值</el-button>
             </div>
         </div>
         
@@ -182,13 +249,16 @@
                 mandatory: true,
 
                 checkboxModelTree: null,
-
-                radioModelTree: null,
-
                 checkboxUseKey: ['id', 'parent'],
 
+                radioModelTree: null,
                 radioUseKey: ['id', 'parent'],
 
+                checkboxModelTreeAsync: null,
+                checkboxUseKeyAsync: ['id', 'parent'],
+
+                radioModelTreeAsync: null,
+                radioUseKeyAsync: ['id', 'parent'],
 
                 modal: {
                     show: false,
@@ -226,7 +296,6 @@
                     //     { id: 'yage', a: '', b: '' },
                     //     { id: 'xuefulan', a: '', b: '' },
                     // ]
-
                     Object.assign(this.modal.data, {
                         vehicleList: mockData,
                         vehicle: ''
@@ -237,12 +306,20 @@
                 else  {
                     const mockData = 'siyu'
                     // const mockData = { id: 'siyu', a: '' }
-                    
                     Object.assign(this.modal.data, {
                         vehicle: mockData,
                         vehicleList: []
                     })
                 }
+            },
+
+
+            handleSetValue(result) {
+                this.checkboxModelTreeAsync = result
+            },
+
+            handleSetRadioValue(result) {
+                this.radioModelTreeAsync = result
             },
 
             /**
@@ -268,6 +345,12 @@
             handleCommit() {
                 console.log('this.modal.data', this.modal.data)
                 this.modal.show = false
+            },
+
+            async setDefaultValue(refs, value) {
+                const $currentTree = this.$refs[refs]
+                await $currentTree.waitForInit
+                $currentTree.setInputValue(value)
             }
         },
         created() {
@@ -283,6 +366,7 @@
         width: 100%;
         height: 100%;
         padding: var(--default-padding);
+        overflow-y: auto;
 
         .dialogTree-item {
             margin-top: var(--default-padding);

@@ -65,18 +65,22 @@
 
             <div class="setting-item">
                 <el-button type="primary" @click="setHeightLight">设置本田高亮</el-button>
+                <el-button type="primary" @click="clearHeightLight">清空高亮</el-button>
                 <el-button type="primary" @click="scrollToRightView('tang')">滚动到比亚迪唐</el-button>
                 <el-button type="primary" @click="scrollToRightView('siyu')">滚动到思域</el-button>
             </div>
 
             <div class="setting-item">
                 <el-button type="primary" @click="expandCurrentNode">展开本田</el-button>
+                <el-button type="primary" @click="expandAllNode(true)">展开全部</el-button>
+                <el-button type="primary" @click="expandAllNode(false)">收起全部</el-button>
             </div>
 
 
             <div class="setting-item">
-                <span class="card">点击事件： {{ clickEventNum }}</span>
-                <span class="card">双击事件 {{ dbClickEventNum }}</span>
+                <span class="card" v-show="!useDBClick">普通点击事件： {{ nodeClickEventNum }}</span>
+                <span class="card" v-show="useDBClick">[双击模式] 点击事件： {{ clickEventNum }}</span>
+                <span class="card" v-show="useDBClick">[双击模式] 双击事件 {{ dbClickEventNum }}</span>
                 <span class="card">选中事件： {{ checkEventNum }}</span>
             </div>
         </div>
@@ -108,7 +112,9 @@ export default {
 
            clickEventNum: 0,
 
-           dbClickEventNum: 0
+           dbClickEventNum: 0,
+
+           nodeClickEventNum: 0
        };
     },
     watch: {
@@ -140,6 +146,11 @@ export default {
             $tree.setCurrentKey('siyu')
         },
 
+        clearHeightLight() {
+            const $tree = this.$refs['treeInstance']
+            $tree.clearCurrent()
+        },
+
         scrollToRightView(type) {
             const $tree = this.$refs['treeInstance']
             $tree.scrollToRightView(type)
@@ -148,6 +159,11 @@ export default {
         expandCurrentNode() {
             const $tree = this.$refs['treeInstance']
             $tree.expandByNodeId('bentian')
+        },
+
+        expandAllNode(type) {
+            const $tree = this.$refs['treeInstance']
+            $tree.expandAllNode(type)
         },
 
 
@@ -161,6 +177,10 @@ export default {
 
         handleNodeSimpleClick(data, node) {
             this.clickEventNum ++
+        },
+
+        handleNodeClick(data, node) {
+            this.nodeClickEventNum ++
         }
 
 

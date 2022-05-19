@@ -71,9 +71,9 @@
              * async 异步  走 emit &  @change
              * sync  同步  调用之后可直接获取  result = await initDialogTree(' 想选中的值的id / list ')
              */
-            commitWay: {
-                type: String,
-                default: 'sync'
+            asyncCommit: {
+                type: Boolean,
+                default: false
             },
 
             /**
@@ -139,13 +139,13 @@
         computed: {
             treeShow: {
                 get() {
-                    return this.commitWay === 'sync' ? this.modal.show : this.show
+                    return this.asyncCommit ? this.show: this.modal.show
                 },
                 set(val) {
-                    if(this.commitWay === 'sync') {
-                        this.modal.show = val
-                    } else {
+                    if(this.asyncCommit) {
                         this.$emit('modify', val)
+                    } else {
+                        this.modal.show = val
                     }
                 }
             },
@@ -213,7 +213,7 @@
 
                 this.modal.loading = false
                 await this.$nextTick()
-                if (this.commitWay === 'sync') {
+                if (!this.asyncCommit) {
                     return new Promise((resolve, reject) => {
                         this.resultResolve = resolve
                     })
@@ -257,13 +257,13 @@
                     return
                 }
 
-                if (this.commitWay === 'sync') {
+                if (this.asyncCommit) {
+                    this.$emit('change', result)
+                } else {
                     if (this.resultResolve) {
                         this.resultResolve(result)
                     }
                     this.handleOpen(false)
-                } else {
-                    this.$emit('change', result)
                 }
             },
 
@@ -330,7 +330,7 @@
             }
         },
         created() {
-            if(this.commitWay === 'async') {
+            if(this.asyncCommit) {
                 this.reSetPromiseInit()
             }
         },

@@ -73,6 +73,11 @@
                 default: () => []
             },
 
+            defaultSelect: {
+                type: String,
+                default: ''
+            },
+
             /**
              * 
              * 可以根据这个东西 直接切换想要的树，这个数据是存到 vuex 里面的
@@ -80,11 +85,6 @@
              * 
              */
             treeSign: {
-                type: String,
-                default: ''
-            },
-
-            defaultSelect: {
                 type: String,
                 default: ''
             },
@@ -107,6 +107,26 @@
 
             /**
              * 
+             * 树的图标是否显示
+             * 
+             */
+            treeIcon: {
+                type: Boolean,
+                default: true
+            },
+
+            /**
+             * 
+             *  树的导航线
+             * 
+             */
+            treeLine: {
+                type: Boolean,
+                default: false
+            },
+
+            /**
+             * 
              * 自定义节点渲染函数 会覆盖掉slot的内容
              * 注意 渲染函数不会 添加 data-v-xxxxx 不会受到scoped样式影响 需要添加全局样式
              * 
@@ -116,8 +136,6 @@
                 type: Function,
                 default: null
             },
-
-
 
             /**
              * 
@@ -129,18 +147,6 @@
                 default: false
             },
             
-
-            /**
-             * 
-             * 树的图标是否显示
-             * 
-             */
-            treeIcon: {
-                type: Boolean,
-                default: true
-            },
-
-
             /**
              *
              *  节点显示规则
@@ -163,16 +169,7 @@
                     return {}
                 }
             },
-
-            /**
-             * 
-             *  树的导航线
-             * 
-             */
-            treeLine: {
-                type: Boolean,
-                default: false
-            },
+            
 
             treeData: {
                 type: Array,
@@ -366,6 +363,25 @@
                 }
             },
 
+            /**
+             *
+             *  拒绝监听vuex数据，这里添加是否从 API获取数据，与 ztreeData 呼应上
+             *
+             */
+            async initTreeData(type = this.treeSign, fromApi = true) {
+                if (!type) return
+                this.tree.loading = true
+                /**
+                 *  根绝type 去 vuex 中拿到想要的数据
+                 */
+                const treeData = await this.GetTreeDataArrayBySign({ type, fromServer: fromApi })
+                this.tree.dataArray = JSON.parse(JSON.stringify(treeData))
+                await this.$nextTick()
+                this.handleOverInit()
+                this.tree.loading = false
+            },
+
+
             async handleOverInit(list = null) {
                 this.handleInitCustom()
                 const $tree = this.$refs['tree']
@@ -416,24 +432,6 @@
             },
 
 
-            /**
-             *
-             *  拒绝监听vuex数据，这里添加是否从 API获取数据，与 ztreeData 呼应上
-             *
-             */
-            async initTreeData(type = this.treeSign, fromApi = true) {
-                if (!type) return
-                this.tree.loading = true
-                /**
-                 *  根绝type 去 vuex 中拿到想要的数据
-                 */
-                const treeData = await this.GetTreeDataArrayBySign({ type, fromServer: fromApi })
-                this.tree.dataArray = JSON.parse(JSON.stringify(treeData))
-                await this.$nextTick()
-                this.handleOverInit()
-                this.tree.loading = false
-            },
-
 
 
             /**
@@ -459,9 +457,9 @@
                 }
             },
             
-            setCheckedKeys(keys, async = false) {
+            setCheckedKeys(keys, leafOnly = false, async = false) {
                 const $tree = this.$refs['tree']
-                $tree.setCheckedKeys(keys)
+                $tree.setCheckedKeys(keys, leafOnly)
                 if(async) {
                     this.handleNodeCheck({}, this.getTreeCurrentState(), null)
                 }
@@ -501,10 +499,25 @@
                 this.expandByNode(node)
             },
 
+            expandAllNode(type) {
+                var nodes = this.$refs.tree.store.nodesMap;
+                for (var i in nodes) {
+                    nodes[i].expanded = type;
+                }
+            },
+
+
+
 
             /**
              * 
+             * 
+             * 
              * 选中点击事件
+             * 
+             * 
+             * 
+             * 
              * 
              */
             handleCheckChange(data, checked, tree) {
@@ -526,6 +539,7 @@
                         this.$emit('node-double-click', data, node)
                     } else {
                         this.dblickEvent = setTimeout(() => {
+                            this.$emit('node-simple-click', data, node)
                             this.dblickEvent = undefined
                         }, 300)
                     }
@@ -540,7 +554,6 @@
                             }
                         }
                     }
-                    this.$emit('node-simple-click', data, node)
                 }
             },
 
@@ -568,6 +581,15 @@
                 }
             },
 
+            getTreeCurrentState() {
+                const $tree = this.$refs['tree']
+                return {
+                    checkedNodes: $tree.getCheckedNodes(),
+                    checkedKeys: $tree.getCheckedKeys(),
+                    halfCheckedNodes: $tree.getHalfCheckedNodes(),
+                    halfCheckedKeys: $tree.getHalfCheckedKeys()
+                }
+            },
 
             
             /**
@@ -608,15 +630,7 @@
                 this.scrollToRightView()
             },
 
-            getTreeCurrentState() {
-                const $tree = this.$refs['tree']
-                return {
-                    checkedNodes: $tree.getCheckedNodes(),
-                    checkedKeys: $tree.getCheckedKeys(),
-                    halfCheckedNodes: $tree.getHalfCheckedNodes(),
-                    halfCheckedKeys: $tree.getHalfCheckedKeys()
-                }
-            },
+            
 
 
             scrollToRightView: _.debounce(async function(nodeId = null) {
