@@ -209,15 +209,8 @@
             /**
              * 
              * 传值的方式如下
-             * 
-             * 如果是普通情况的 就 ['id'] 即可
-             * 
-             * 也可以是 但是注意啊，这个id 必须和树上你想要的那个 id 名字一样 ，就是唯一值！！！！如果是
-             * [
-             *  { id: '', type: '' },
-             *  { id: '', type: '' },
-             *  { id: '', type: '' }
-             * ]
+             * 我咋传给你，你咋传给我就行了
+             * 如果该值不是你想要的，可以通过 watch 一下绑定的变量 把监听的值转换下在赋给你想要的变量上
              * 
              */
             async handleOpenFormModal(type) {
@@ -240,11 +233,10 @@
                     })
                 }
                 
-                // 单选情况 甩他妈个 id 就行了！
+                // 单选情况 唯一值的 id 必须要在！
                 else  {
-                    // const mockData = 'siyu'
-
-                    const mockData = { id: 'siyu', a: '' }
+                    const mockData = 'siyu'
+                    // const mockData = { id: 'siyu', a: '' }
                     
                     Object.assign(this.modal.data, {
                         vehicle: mockData,

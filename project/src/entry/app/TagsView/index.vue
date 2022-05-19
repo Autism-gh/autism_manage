@@ -210,7 +210,8 @@
 
         .tags-view-wrapper {
             .tags-view-item {
-                display: inline-block;
+                display: inline-flex;
+                align-items: center;
                 position: relative;
                 cursor: pointer;
                 height: 26px;
@@ -289,6 +290,8 @@
                 text-align: center;
                 transition: all .3s cubic-bezier(.645, .045, .355, 1);
                 transform-origin: 100% 50%;
+                display: flex;
+                margin-left: 5px;
 
                 &:before {
                     transform: scale(.6);
