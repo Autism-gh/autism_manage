@@ -2,7 +2,7 @@
     <div>
         首页测试最好使
         <div style="height: 400px; height: 500px">
-            <CodeArea :code="code" ></CodeArea>
+            <CodeArea color :code="code" ></CodeArea>
         </div>
     </div>
 </template>
