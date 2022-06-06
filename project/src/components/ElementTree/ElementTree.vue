@@ -78,6 +78,11 @@
                 default: ''
             },
 
+            defaultCheckAll: {
+                type: Boolean,
+                default: false
+            },
+
             /**
              * 
              * 可以根据这个东西 直接切换想要的树，这个数据是存到 vuex 里面的
@@ -424,10 +429,17 @@
 
                     if (this.checkMode === 'radio') {
                         const checkId = this.defaultChecked[0]
-                        this.expandByNodeId(checkId)
                         $tree.setChecked(checkId, true, false)
-                        $tree.setCurrentKey(checkId)
+                        this.scrollToRightView(checkId)
                     }
+                }
+
+                if(this.defaultCheckAll) {
+                    // const { id } = this.nodeOptions
+                    // const keysList = this.tree.dataArray.map(item => item[id])
+                    // $tree.setCheckedKeys(keysList)
+                    // 两者皆可
+                    $tree.setCheckedNodes(this.tree.dataArray)
                 }
             },
 
@@ -631,7 +643,6 @@
             },
 
             
-
 
             scrollToRightView: _.debounce(async function(nodeId = null) {
                 const $tree = this.$refs['tree']

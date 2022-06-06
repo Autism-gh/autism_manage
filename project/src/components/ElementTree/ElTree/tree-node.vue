@@ -196,11 +196,21 @@
         if (this.tree.expandOnClickNode) {
           this.handleExpandIconClick();
         }
+
+        /**
+         * 【DIFFERENT FORM NORMAL】
+         *  与环境内引入得冲突，注销
+         */
         if (this.tree.checkOnClickNode && !this.node.disabled) {
+          const { showCheckbox } = this.node.data
+          if(showCheckbox !== undefined && !showCheckbox) return
           this.handleCheckChange(null, {
             target: { checked: !this.node.checked }
           });
         }
+        /**
+         * END
+         */
         this.tree.$emit('node-click', this.node.data, this.node, this);
       },
 

@@ -5,7 +5,7 @@
         :popper-append-to-body="false"
         :placeholder="placeholder" 
         popper-class="tree-select-container" 
-        @visible-change="handleScroll($event, false)">
+        @visible-change="handleScroll">
 
         <!-- 演员 -->
         <el-option :style="formatTreeStyle" value="">&nbsp;</el-option>
@@ -317,6 +317,8 @@
                 const keyRules = isEmpty(this.useKey) ? ruleId : this.useKey
                 const arrayType = Array.isArray(keyRules)
 
+                if(!handleNode) return
+
                 let formatData = deepClone(handleNode)
                 if(this.checkMode === 'radio') {
                     formatData = formatData[0]
@@ -366,14 +368,10 @@
 
 
 
-            handleScroll(val, deep = true) {
-                const { heightLightId } = this.selectTree
+            handleScroll(val) {
+                if(!val) return
                 const $tree = this.$refs['selectTree']
-                if (!val || !heightLightId) return
-                if (deep) {
-                    $tree.scrollToRightView(heightLightId)
-                    return
-                }
+                $tree.scrollToRightView(heightLightId)
             },
 
 
@@ -385,7 +383,9 @@
                 const canList = this.handleCanSelectList(treeList)
                 this.select.rootNumber = canList.length
 
-                this.setInputValue()
+                const checked = $tree.getCheckedNodes()
+                this.setInputValue(checked)
+                
                 this.promiseResolve({ state: true, message: 'OK' })
             },
 
