@@ -1,5 +1,5 @@
 <template>
-    <pre :class="['code-container', { 'hascolor': color }]">
+    <pre :class="['code-container', { 'hascolor': color }]" :style="formatStyle">
         <div class="code-content" v-html="html"></div>
     </pre>
 </template>
@@ -25,6 +25,11 @@ export default {
         indent: {
             type: Number,
             default: 2
+        },
+
+        height: {
+            type: [String],
+            default: 'max-content'
         }
     },
     name: '',
@@ -39,7 +44,9 @@ export default {
         }
     },
     computed: {
-        
+        formatStyle() {
+            return `height: ${ this.height }`
+        }
     },
     methods: {
         reflashCode(code = null) {
@@ -47,7 +54,7 @@ export default {
             let source = isObject(code) ? JSON.stringify(this.code, null, this.indent) : this.code
             source = source.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
 
-            const format = source.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+            const format = source.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+]?\d+)?)/g, function(match) {
                 var cls = 'number';
                 if (/^"/.test(match)) {
                     if (/:$/.test(match)) {
@@ -99,9 +106,7 @@ export default {
 .code-container {
     position: relative;
     width: 100%;
-    height: 100%;
-    outline: 1px solid #ccc; 
-    padding: 5px; margin: 5px; 
+    border: 1px solid var(--border-color-base); 
     overflow: auto;
 
     .code-content {

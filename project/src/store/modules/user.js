@@ -2,6 +2,8 @@ import { getToken, setToken, removeToken } from '@/util/app/auth'
 
 import router, { resetRouter } from '@/router'
 
+import { loginSubject } from '@/service/loginService'
+
 import { Base64 } from 'js-base64'
 
 import moment from 'moment'
@@ -50,6 +52,7 @@ const actions = {
                     const mockToken = 'BIRENWUCHUANGQINGDUOGUANZHAO'
                     commit('SET_TOKEN', mockToken)
                     setToken(mockToken)
+                    loginSubject.next(1)
 
                     console.log('【log, 用户登入】', username, password)
                     resolve(true)
@@ -60,6 +63,26 @@ const actions = {
                 reject(error)
             }
             
+        })
+    },
+
+    // user logout
+    logout({ commit, dispatch }) {
+        return new Promise((resolve, reject) => {
+            try {
+                commit('SET_TOKEN', '')
+                commit('SET_ROLES', [])
+                removeToken()
+                resetRouter()
+                // reset visited views and cached views
+                // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
+                dispatch('tagsView/delAllViews', null, { root: true })
+
+                loginSubject.next(0)
+                resolve()
+            } catch (error) {
+                reject()
+            }
         })
     },
 
@@ -119,23 +142,7 @@ const actions = {
         })
     },
 
-    // user logout
-    logout({ commit, dispatch }) {
-        return new Promise((resolve, reject) => {
-            try {
-                commit('SET_TOKEN', '')
-                commit('SET_ROLES', [])
-                removeToken()
-                resetRouter()
-                // reset visited views and cached views
-                // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
-                dispatch('tagsView/delAllViews', null, { root: true })
-                resolve()
-            } catch (error) {
-                reject()
-            }
-        })
-    },
+    
 
     // remove token
     resetToken({ commit }) {

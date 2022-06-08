@@ -130,10 +130,10 @@
         },
         methods: {
             handleTreeReady($tree, { treeList, treeData, firstNode }) {
-                // console.log('$tree', $tree)
-                // console.log('treeList', treeList)
-                // console.log('treeData', treeData)
-                // console.log('firstNode', firstNode)
+                console.log('$tree', $tree)
+                console.log('treeList', treeList)
+                console.log('treeData', treeData)
+                console.log('firstNode', firstNode)
             },
 
             async changeTreeData() {

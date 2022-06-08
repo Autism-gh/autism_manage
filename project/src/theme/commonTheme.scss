@@ -162,4 +162,44 @@ html {
   box-shadow: var(--box-shadow-base);
 }
 
+// padding
+@include b(padding) {
+  @include m(l) {
+    padding-left: var(--default-padding);
+  }
+  @include m(r) {
+    padding-right: var(--default-padding);
+  }
+  @include m(t) {
+    padding-top: var(--default-padding);
+  }
+  @include m(b) {
+    padding-bottom: var(--default-padding);
+  }
+  @include m(lr) {
+    padding-right: var(--default-padding);
+    padding-left: var(--default-padding);
+  }
+}
+
+
+// margin
+@include b(margin) {
+  @include m(l) {
+    margin-left: var(--default-padding);
+  }
+  @include m(r) {
+    margin-right: var(--default-padding);
+  }
+  @include m(t) {
+    margin-top: var(--default-padding);
+  }
+  @include m(b) {
+    margin-bottom: var(--default-padding);
+  }
+  @include m(lr) {
+    margin-right: var(--default-padding);
+    margin-left: var(--default-padding);
+  }
+}
 

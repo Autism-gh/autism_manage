@@ -13,6 +13,14 @@ const assemblyRouter = {
     },
     children: [
         {
+            path: 'SubscribeData',
+            component: () => import('@/page/assembly/SubscribeData'),
+            name: 'SubscribeData',
+            meta: {
+                title: '订阅数据'
+            }
+        },
+        {
             path: 'treedemo',
             component: () => import('@/page/assembly/TreeDemo'),
             name: 'TreeDemo',

@@ -43,15 +43,13 @@ export default {
     methods: {
         async changeTheme(type) {
             await this.$setTheme(type)
-
-            console.log('sssssss', this)
         }
     },
     created() {
         
     },
     async mounted() {
-        console.log('s', this)
+        
     },
 };
 </script>
