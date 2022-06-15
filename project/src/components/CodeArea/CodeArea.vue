@@ -24,7 +24,7 @@ export default {
         // 缩进
         indent: {
             type: Number,
-            default: 2
+            default: 4
         },
 
         height: {

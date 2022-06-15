@@ -1,11 +1,25 @@
 import Vue from 'vue'
 
+import store from '@/store';
+
 import CustomTheme from '@/theme'
 
 import ElementUI from 'element-ui';
 
+import Mqtt from '@/service/class/mqtt'
+
 Vue.use(CustomTheme);
 
+Vue.prototype.$getMqtt = () => {
+    const { $mqtt } = Vue.prototype
+    if(!$mqtt) {
+        Vue.prototype.$mqtt = new Mqtt({
+            host: '10.33.0.108',
+            port: 8083
+        })
+    }
+    return Vue.prototype.$mqtt
+}
 
 Vue.prototype.$showwifemessage = (message) => {
     store.commit('wife/changeMessage', message)

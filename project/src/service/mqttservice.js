@@ -7,7 +7,7 @@
  * 
  */
 
-import Mqtt, { logPrefix } from './util/pahomqtt'
+import Mqtt, { logPrefix } from './class/pahomqtt'
 import * as translate from './util/translatedata'
 import { loginSubject } from './loginService'
 import Rx from 'rxjs'
@@ -64,7 +64,7 @@ export const subscribeMqtt = (toptic) => {
  * @param {} cmd 
  * @returns 
  */
-const createNromalObservable = (topic) => {
+export const createNromalObservable = (topic) => {
     return Rx.Observable.create((observer) =>{ 
         sourceInstance.filter(message => message && message?.topic === topic) .subscribe(message => observer.next(message))
     }).share()
@@ -74,7 +74,7 @@ const createNromalObservable = (topic) => {
  * 这种属于高级订阅， 需要通知服务端一声否则不给数据
  * 后续可以追加心跳避免终端
  */
-const createMaticsObservable = (topic) => {
+export const createMaticsObservable = (topic) => {
     subscribeMqtt(topic)
     return Rx.Observable.create((observer) =>{ 
         sourceInstance.filter(message => message && message?.topic === topic) .subscribe(message => observer.next(message))

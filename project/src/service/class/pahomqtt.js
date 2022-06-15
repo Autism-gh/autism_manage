@@ -133,7 +133,7 @@ class Mqtt {
             console.log("onConnectionLost:", responseObject.errorMessage);
         }
         
-        console.log(`${ logPrefix } 连接丢失 ······`)
+        console.log(`${ logPrefix } 连接已断开 ······`)
     }
 
     /**
