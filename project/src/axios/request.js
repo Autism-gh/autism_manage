@@ -72,7 +72,6 @@ export const post = (url) => {
             method: 'post',
             url,
             data,
-            useLoading,
             headers: {
                 'Content-Type': contentType.default
             },
@@ -90,7 +89,6 @@ export const postForm = (url) => {
             method: 'post',
             url,
             data,
-            useLoading,
             headers: {
                 'Content-Type': `${contentType.form};`
             }
@@ -105,7 +103,6 @@ export const postObjToForm = (url) => {
             method: 'post',
             url,
             data,
-            useLoading,
             headers: {
                 'Content-Type': `${contentType.form};`
             },
@@ -125,7 +122,6 @@ export const get = (url) => {
             params: {
                 ...data
             },
-            useLoading,
             headers: {
                 'Content-Type': contentType.default
             }

@@ -108,7 +108,7 @@ const mutations = {
 
 const actions = {
     //  如果没有在vuex 中拿到数据那么重新请求一下
-    async getTreeData({ state, commit, dispatch }, params) {
+    async getTreeData({ state, commit }, params) {
         let type
         // 是否在去服务器上拿一份？？ fromServer  true 去， false  不去
         let fromServer = true

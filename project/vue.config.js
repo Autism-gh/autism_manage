@@ -25,6 +25,7 @@ module.exports = {
         }
     },
 
+    // eslint-disable-next-line no-dupe-keys
     configureWebpack: config => {
         config.externals = assetsCDN.externals;
     }

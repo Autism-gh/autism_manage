@@ -31,13 +31,10 @@ const extand = {
     '--menu-text': '#bfcbd9',
     '--menu-active-text': '#ff7940',
     '--sub-menu-active-text': '#f4f4f5',
-
     '--menu-bg': '#2e2e2e',
     '--menu-hover': '#333333',
-
     '--sub-menu-bg': '#1f2d3d',
     '--sub-menu-hover': '#001528',
-
     '--side-bar-width': '210px'
 }
 

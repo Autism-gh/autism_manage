@@ -8,19 +8,11 @@
             copyright© 2021 <span class="text--brand">AUTISM</span> Co. Ltd. All Rights Reserved.
         </div>
 
-        <!-- <div class="login__footer">
-            <div :style="formatStyle">你要永远相信光</div>
-            <el-button type="primary" @click="changeTheme('blue')">blue</el-button>
-            <el-button type="success" @click="changeTheme('night')">night</el-button>
-            <el-button type="info" @click="changeTheme('orange')">orange</el-button>
-        </div> -->
-
     </div>
 </template>
 
 <script>
 import LoginForm from './login/LoginForm.vue'
-import { mapState } from 'vuex'
 export default {
     name: 'Login',
     components: { LoginForm },
@@ -34,16 +26,10 @@ export default {
         
     },
     computed: {
-        ...mapState('settings', ['themeOptions']),
-
-        formatStyle() {
-            return `color: ${ this.themeOptions ? this.themeOptions.colorprimary : 'red' }`
-        }
+        
     },
     methods: {
-        async changeTheme(type) {
-            await this.$setTheme(type)
-        }
+        
     },
     created() {
         
