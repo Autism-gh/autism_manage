@@ -6,7 +6,9 @@ const getters = {
     cachedViews: state => state.tagsView.cachedViews,
 
     roles: state => state.user.roles,
-    errorLogs: state => state.errorLog.logs
+    errorLogs: state => state.errorLog.logs,
+
+    columnsSettings: state => state.columns.columnsSettings,
   }
   export default getters
   

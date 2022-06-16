@@ -17,33 +17,63 @@
             <slot name="button"></slot>
         </div>
         <div class="table-wrapper">
+            <div class="table-lock-icon">
+                <i class="el-icon-download"></i>
+                <i class="el-icon-setting" @click="handleOpenFieldDialog"></i>
+            </div>
+
             <el-table 
+                ref="automaticstable"
                 :data="tableData" 
                 border stripe highlight-current-row
                 height='100%'
-                style="width: 100%">
+                style="width: 100%"
+                v-on="$listeners">
                 <el-table-column
+                    v-if="preColumns.includes('checkbox')"
                     type="selection"
-                    width="55">
-                </el-table-column>
-                <el-table-column
-                    type="index"
-                    width="50">
-                </el-table-column>
-                <el-table-column 
-                    v-for="item in tableOptions" 
-                    :key="item.field" 
-                    :prop="item.field" 
-                    :label="item.name"
-                    align="center">
+                    width="55"
+                    align="center"
+                    fixed>
                 </el-table-column>
 
-                <el-table-column fixed="right" label="操作" width="100">
-                    <template>
-                        <el-button type="text" size="small">查看</el-button>
-                        <el-button type="text" size="small">编辑</el-button>
+                <el-table-column
+                    v-if="preColumns.includes('index')"
+                    label="序号"
+                    type="index"
+                    width="50"
+                    align="center"
+                    fixed>
+                </el-table-column>
+
+                <el-table-column 
+                    v-for="(item, index) in formatFieldsConfig" 
+                    :key="`${ item.field }-${ index }`" 
+                    :label="item.name"
+                    :width="item.width"
+                    :min-width="item.minWidth"
+                    :fixed="item.fixed"
+                    :sortable="item.sortable"
+                    :align="item.align">
+                    
+                    <template slot-scope="{ row }">
+                        <template v-if="item.components">  
+                            <component :is="item.components"></component>
+                        </template>
+                        <template v-else>
+                            {{ row[item.field] }}
+                        </template>
+                    </template>
+
+                </el-table-column>
+
+                <el-table-column fixed="right" label="操作" width="100" align="center">
+                    <template slot-scope="{ row }">
+                        <i @click.stop="handleEmitEvent(item, row)" class="element-table-icon" v-for="item in manageColumn" :key="item.event" :class="item.icon"></i>
                     </template>
                 </el-table-column>
+
+                <el-table-column fixed="right" label="" width="70"></el-table-column>
             </el-table>
         </div>
         <div class="page-wrapper">
@@ -54,20 +84,31 @@
                 <el-pagination
                     v-bind="pageAttrs"
                     :current-page.sync="currentPage"
-                    :page-size.sync="size"
-                    :total="total"
+                    :page-size.sync="currentPageSize"
+                    :total="formatToal"
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>
+
+        <FieldsSetting ref="FieldsSetting"></FieldsSetting>
     </div>
 </template>
 
 <script>
 import { scrollTo } from '@/util/common/scroll-to'
+import FieldsSetting from './components/FieldsSetting.vue'
+// import ComponetRow from '@/page/bussiness/DriverManage/components/ComponetRow.vue'
+import EVENTS from '@/util/EVENTS'
 export default {
-    components: {  },
+    components: { 
+        FieldsSetting,
+
+        /* eslint-disable */
+        // ComponetRow
+        /* eslint-enable */
+    },
     props: {  
 
         /**
@@ -77,7 +118,8 @@ export default {
             type: Object,
             default: function() {
                 return {
-                    pageSizes: [30, 50, 100, 150, 200],
+                    // pageSizes: [30, 50, 100, 150, 200],
+                    pageSizes: [2, 3, 4, 5, 6],
                     layout: 'total, sizes, prev, pager, next, jumper',
                 }
             }
@@ -88,7 +130,7 @@ export default {
             default: 1
         },
 
-        size: {
+        pagesize: {
             type: Number,
             default: 50
         },
@@ -98,17 +140,14 @@ export default {
             type: Number
         },
 
-        /**
-         * 
-         * 显示配置
-         * 
-         */
+        gridTag: {
+            type: String,
+            default: ''
+        },
 
-        fieldConfig: {
-            type: Array,
-            default: function() {
-                return []
-            }
+        pinned: {
+            type: Number,
+            default: 2,
         },
 
         /**
@@ -136,19 +175,51 @@ export default {
             }
         },
 
+        manageColumn: {
+            type: Array,
+            default: function() {
+                return []
+            }
+        },
 
+        /**
+         * 
+         * 显示配置
+         * 
+         */
+
+        fieldConfig: {
+            type: Array,
+            default: function() {
+                return []
+            }
+        },
+        
+        // 选中的
+        checkedField: {
+            type: Array,
+            default: function() {
+                return []
+            }
+        }
 
     },
     name: '',
     data() {
         return {
-            showMore: false,
+            showMore: false
         };
     },
     watch: {
-        
+        formatFieldsConfig() {
+            this.reflash()
+        }
     },
     computed: {
+        formatToal() {
+            return this.total || this.tableData?.length || 0
+        },
+
         pageAttrs() {
             return Object.assign(this.pageOptions, this.$attrs)
         },
@@ -161,36 +232,75 @@ export default {
                 this.$emit('update:page', val)
             }
         },
-        pageSize: {
+        currentPageSize: {
             get() {
-                return this.size
+                return this.pagesize
             },
             set(val) {
-                this.$emit('update:size', val)
+                this.$emit('update:pagesize', val)
             }
         },
+
+        formatFieldsConfig() {
+            return this.fieldConfig.map((item, index) => {
+                const { width, minWidth, align } = item
+                return Object.assign(item, {
+                    fixed: index < (this.pinned - this.preColumns.length),
+                    width: width || 150,
+                    minWidth: minWidth || 150,
+                    align: align || 'center'
+                })
+            })
+        }
     },
     methods: {
+        handleOpenFieldDialog() {
+            this.$refs['FieldsSetting'].handleOpenModal({
+                allData: this.fieldConfig,
+                checked: this.checkedField,
+                pinned: this.pinned,
+                gridTag: this.gridTag,
+            })
+        },
+
         handleSizeChange(val) {
-            this.$emit('pagination', { page: this.currentPage, pageSize: val })
+            this.$emit('pagination', { page: this.currentPage, pagesize: val })
             if (this.autoScroll) {
                 scrollTo(0, 800)
             }
         },
 
         handleCurrentChange(val) {
-            this.$emit('pagination', { page: val, pageSize: this.pageSize })
+            this.$emit('pagination', { page: val, pagesize: this.currentPageSize })
             if (this.autoScroll) {
                 scrollTo(0, 800)
             }
+        },
+
+        handleEmitEvent({ event }, row) {
+            this.$emit(event, row)
+        },
+
+
+        reflash() {
+            this.$refs['automaticstable'].doLayout()
         }
     },
     created() {
         
     },
+    beforeMount() {
+        this.$on(EVENTS.MANAGE_HANDLER, (type, data) => {
+            this.$emit(type, data)
+        })
+    },
     mounted() {
         
     },
+
+    beforeDestroy() {
+        this.$off(EVENTS.MANAGE_HANDLER, () => {})
+    }
 };
 </script>
 <style lang="scss" scoped>

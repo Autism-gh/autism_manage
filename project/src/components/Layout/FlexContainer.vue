@@ -77,6 +77,7 @@
         height: 100%;
         border-radius: 4px;
         background-color: var(--color-white);
+        padding: var(--default-padding);
     }
     .right-wrapper {
         height: 100%;

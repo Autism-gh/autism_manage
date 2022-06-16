@@ -1,8 +1,8 @@
 'use strict'
 import axios from 'axios'
 import store from '@/store'
-import { changeObjToKeyValueForm } from './util'
 import { Message } from 'element-ui'
+import { changeObjToKeyValueForm } from '../util'
 import QS from 'qs'
 
 const TIMEOUT = 30 * 1000

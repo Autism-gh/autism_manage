@@ -22,7 +22,7 @@ function checkNeed() {
 }
 
 if (checkNeed()) {
-    Vue.config.errorHandler = function (err, vm, info, a) {
+    Vue.config.errorHandler = function (err, vm, info) {
         Vue.nextTick(() => {
             store.dispatch('errorLog/addErrorLog', {
                 err,

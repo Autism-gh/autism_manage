@@ -305,7 +305,7 @@
 
         watch: {    
             treeData: {
-                handler: function(value, oldV) {
+                handler: function(value) {
                     // 重置验证装置
                     this.reSetPromiseInit()
                     // 好像会串数据走深拷贝 后面再看看
@@ -320,7 +320,7 @@
             },
 
             'tree.dataArray': {
-                handler: async function(value, oldV) {
+                handler: async function(value) {
                     if (!value || !value.length) {
                         this.tree.dataObject = []
                         return
@@ -332,7 +332,7 @@
                 immediate: true
             },
 
-            'query.value': function(value, oldV) {
+            'query.value': function(value) {
                 if (!value) return
                 const $tree = this.$refs['tree']
                 const node = $tree.getNode(value)
@@ -340,7 +340,7 @@
                 node.expand(null, true)
             },
 
-            checkMode(newVal) {
+            checkMode() {
                 this.clearChecked()
             }
         },
@@ -532,18 +532,18 @@
              * 
              * 
              */
-            handleCheckChange(data, checked, tree) {
+            handleCheckChange(data, checked) {
                 if (this.checkMode === 'radio' && checked) {
                     this.tree.currentChecked = data
                     this.$refs.tree.setCheckedNodes([data])
                 }
             },
 
-            async handleNodeCheck(data, node, $node) {
+            async handleNodeCheck(data, node) {
                 this.$emit('node-check', data, node)
             },
 
-            handleNodeClick(data, node, $node) {
+            handleNodeClick(data, node) {
                 if (this.useDBClick) {
                     if (this.dblickEvent) {
                         clearTimeout(this.dblickEvent)
@@ -628,7 +628,7 @@
                 }
             },
 
-            async sendSelectNode(index) {
+            async sendSelectNode() {
                 const $tree = this.$refs['tree']
                 const node = $tree.getNode(this.query.value)
                 $tree.setCurrentKey(node[this.nodeOptions.id])
@@ -692,7 +692,6 @@
 
     .header-wrapper {
         position: relative;
-        padding: var(--default-padding);
 
         .el-select {
             width: 100%;
@@ -700,17 +699,17 @@
 
         .tree-search-icon {
             position: absolute;
-            right: 20px;
-            top: 16px;
+            right: 10px;
+            top: 6px;
             font-size: 16px;
             color: var(--color-text-secondary);
         }
     }   
     
     .content-wrapper {
+        margin-top: var(--default-padding);
         flex-grow: 1;
         overflow: auto;
-        margin: 0 var(--default-padding);
     }
 
     .elementTree-tree-row {

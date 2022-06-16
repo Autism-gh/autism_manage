@@ -36,7 +36,7 @@ function extend(to, _from) {
         to[key] = _from[key];
     }
     return to;
-};
+}
 
 export function toObject(arr) {
     var res = {};
@@ -46,7 +46,7 @@ export function toObject(arr) {
         }
     }
     return res;
-};
+}
 
 /**
  * 
@@ -56,7 +56,7 @@ export function toObject(arr) {
  */
 export function hasOwn(obj, key) {
     return hasOwnProperty.call(obj, key);
-};
+}
 
 
 /**
@@ -111,3 +111,13 @@ export async function timeSleep(ms) {
 export const generateId = function () {
     return Math.floor(Math.random() * 10000);
 };
+
+
+export const listToObj = (list, key) => {
+    if(!list || !list.length) return {}
+    const result = {}
+    list.forEach(item => {
+        result[item[key]] = item
+    })
+    return result
+}
