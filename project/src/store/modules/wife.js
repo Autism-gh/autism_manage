@@ -1,6 +1,6 @@
 const state = {
 
-    wifemessage: '老匹夫，欢迎您！',
+    wifemessage: '这位大帅哥，欢迎您',
 
     modelId: 1,
 }

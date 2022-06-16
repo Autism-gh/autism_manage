@@ -7,7 +7,7 @@
                 </div>
                 <div class="filter-right">
                     <slot name="filterRight"></slot>
-                    <i v-if="$slots.extand" class="el-icon-arrow-down" :class="{up: showMore}" @click="showMore = !showMore" />
+                    <i v-if="$slots.extand" :class="['filter-more-icon', showMore ? 'el-icon-arrow-up': 'el-icon-arrow-down']"  @click="showMore = !showMore" />
                 </div>
             </div>
             <el-collapse-transition>
