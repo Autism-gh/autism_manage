@@ -26,6 +26,14 @@ const bussinessRouter = {
             meta: {
                 title: '司机管理'
             }
+        },
+        {
+            path: 'fencemanage',
+            component: () => import('@/page/bussiness/FenceManage/FenceManage'),
+            name: 'FenceManage',
+            meta: {
+                title: '围栏管理'
+            }
         }
     ]
 }

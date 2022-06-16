@@ -1,5 +1,17 @@
 import store from '@/store'
 
+/**
+ * 
+ *  { name: '修改', icon: 'el-icon-edit-outline', event: 'modify' },
+    { name: '删除', icon: 'el-icon-delete', event: 'remove' },
+    { name: '查看', icon: 'el-icon-search', event: 'show' },
+    { name: '下载', icon: 'el-icon-download', event: 'download' },
+ * 
+ */
+
+const defaultPage = 100
+
+
 const mixin = {
     components: { },
     data() {
@@ -15,13 +27,11 @@ const mixin = {
             manageColumn: [
                 { name: '修改', icon: 'el-icon-edit-outline', event: 'modify' },
                 { name: '删除', icon: 'el-icon-delete', event: 'remove' },
-                // { name: '查看', icon: 'el-icon-search' },
-                // { name: '下载', icon: 'el-icon-download' },
             ],
 
             page: 1,
 
-            pagesize: 2,
+            pagesize: defaultPage,
 
             total: 0,
 

@@ -53,6 +53,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            .filter-right {
+                position: relative;
+            }
+
+            .el-icon-arrow-down {
+                position: absolute;
+                top: 6px;
+                font-size: 16px;
+                right: 65px;
+            }
         }
 
         .extand-floor {

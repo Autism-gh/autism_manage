@@ -7,11 +7,14 @@
                 </div>
                 <div class="filter-right">
                     <slot name="filterRight"></slot>
+                    <i v-if="$slots.extand" class="el-icon-arrow-down" :class="{up: showMore}" @click="showMore = !showMore" />
                 </div>
             </div>
-            <div v-show="showMore" class="extand-floor" v-if="$slots.extand">
-                <slot name="extand"></slot>
-            </div>
+            <el-collapse-transition>
+                <div v-show="showMore" class="extand-floor" v-if="$slots.extand">
+                    <slot name="extand"></slot>
+                </div>
+            </el-collapse-transition>
         </div>
         <div class="botton-wrapper" v-if="$slots.button">
             <slot name="button"></slot>
@@ -58,8 +61,8 @@
                     
                     <template slot-scope="{ row }">
                         <template v-if="item.components">  
-                            <component :is="item.components"></component>
-                        </template>
+                            <slot :data="row" :name="`table-${item.components}`"></slot>
+                        </template> 
                         <template v-else>
                             {{ row[item.field] }}
                         </template>
@@ -99,15 +102,9 @@
 <script>
 import { scrollTo } from '@/util/common/scroll-to'
 import FieldsSetting from './components/FieldsSetting.vue'
-// import ComponetRow from '@/page/bussiness/DriverManage/components/ComponetRow.vue'
-import EVENTS from '@/util/EVENTS'
 export default {
     components: { 
         FieldsSetting,
-
-        /* eslint-disable */
-        // ComponetRow
-        /* eslint-enable */
     },
     props: {  
 
@@ -290,16 +287,14 @@ export default {
         
     },
     beforeMount() {
-        this.$on(EVENTS.MANAGE_HANDLER, (type, data) => {
-            this.$emit(type, data)
-        })
+        
     },
     mounted() {
         
     },
 
     beforeDestroy() {
-        this.$off(EVENTS.MANAGE_HANDLER, () => {})
+
     }
 };
 </script>

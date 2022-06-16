@@ -1,0 +1,26 @@
+// tabs 间距问题
+
+.el-tabs {
+    height: 100%;
+
+    .el-tabs__content {
+        height: calc(100% - 39px);
+        padding: var(--default-padding)!important;
+    }
+
+    .el-tab-pane {
+        height: 100%;
+    }
+}
+
+
+.el-tabs--border-card {
+    border: 0!important;
+    box-shadow: none!important;
+
+    .el-tabs__content {
+        padding: 0!important;
+    }
+}
+
+

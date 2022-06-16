@@ -34,8 +34,23 @@
                     <el-button type="primary">导出</el-button>
                 </template>
 
+                <template slot="filterRight">
+                    <SearchPanel v-model="driverName" @search="handleGetTableData" placeholder="请输入驾驶员名称"></SearchPanel>
+                </template>
+
+                <template slot="extand">
+                    <div class="filter-item">
+                        <span class="title">手机号: </span>
+                        <el-input class="control" v-model="simNo" placeholder="请输入手机号"></el-input>
+                    </div>
+                </template>
+
                 <template slot="pageLeft">
                     <el-button type="primary">删除</el-button>
+                </template>
+
+                <template slot="table-ComponetRow" slot-scope="{ data }">
+                    <el-tag @click.stop="handleEmitExtandEvent(data)">哈哈哈</el-tag>
                 </template>
 
             </TableAutomatic>
@@ -46,30 +61,32 @@
 <script>
     import ElementTree from '@/components/ElementTree/ElementTree'
     import FlexContainer from '@/components/Layout/FlexContainer'
-    import TableAutomatic from '@/components/ElementTable/TableAutomatic'
+    import {TableAutomatic, SearchPanel} from '@/components/ElementTable'
+
+
     import { tableOptions, defaultData } from './components/fieldConfig'
     import singletable from '@/util/mixins/singletable'
-    import ComponetRow from './components/ComponetRow.vue'
     export default {
         components: {
             FlexContainer,
             TableAutomatic,
             ElementTree,
-            
-            /* eslint-disable */
-            ComponetRow
-            /* eslint-enable */
+            SearchPanel
         },
         props: {},
         mixins: [singletable],
         name: 'VehicleManage',
         data() {
             return {
+                gridTag: 'driverManage',
+                
                 platNo: '',
 
                 simNo: '',
 
                 total: 9,
+
+                driverName: '',
 
                 tableData: defaultData,
 
@@ -102,6 +119,14 @@
 
             handleClickRow(row) {
                 console.log('handleClickRow', row)
+            },
+
+            handleEmitExtandEvent(row) {
+                console.log('handleEmitExtandEvent', row)
+            },
+
+            handleGetTableData() {
+                console.log('handleGetTableData', this.driverName)
             }
         },
         created() {

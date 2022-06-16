@@ -24,7 +24,7 @@ const getIPAdress = () => {
     }
 }
 
-const port = process.env.port || process.env.npm_config_port || 9527
+const port = process.env.port || process.env.npm_config_port || 5168
 
 
 module.exports = {
