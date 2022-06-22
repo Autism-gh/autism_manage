@@ -1,16 +1,38 @@
 <template>
     <div :class="['flex-container', { hasBorder, hasShadow }]">
-        <div class="left-wrapper" :style="formatLeftStyle">
+        <div class="left-wrapper" 
+            v-show="$slots.leftWrapper" 
+            v-resize="{ 
+                min: [240,0],
+                max: [500,0],
+                triggerHint: true, 
+                triggerPosition: ['right']
+            }"
+            :style="{width: leftSize + 'px'}">
             <slot name="leftWrapper"></slot>
         </div>
-        <div class="right-wrapper" :style="formatRightStyle">
-            <slot name="rightWrapper"></slot>
+        
+        <div class="right-wrapper">
+            <div class="right-wrapper__top" 
+                v-show="$slots.rightTop"
+                v-resize="{ 
+                    min: [0,0],
+                    max: [Infinity, '50%'],
+                    triggerHint: true, 
+                    triggerPosition: ['bottom']
+                }"
+                :style="{height: topSize + 'px'}">
+                <slot name="rightTop"></slot>
+            </div>
+            <div class="right-wrapper__bottom">
+                <slot name="rightBottom"></slot>
+            </div>
         </div>
+        <slot></slot>
     </div>
 </template>
 
 <script>
-    import { isString } from '@/util/common/type-check.js'
     export default {
         components: {},
         props: {
@@ -21,7 +43,7 @@
 
             topSize: {
                 type: [Number, String],
-                default: 280
+                default: 100
             },
 
             hasBorder: {
@@ -34,7 +56,7 @@
                 default: false
             }
         },
-        name: '',
+        name: 'FlexContainer',
         data() {
             return {
                 
@@ -44,14 +66,7 @@
 
         },
         computed: {
-            formatLeftStyle() {
-                return isString(this.leftSize) ? `width: ${ this.leftSize };` : `width: ${ this.leftSize }px;`
-            },
-
-            formatRightStyle() {
-                const leftWidth = isString(this.leftSize) ? this.leftSize : `${ this.leftSize }px`
-                return `width: calc(100% - ${ leftWidth })`
-            }
+            
         },
         methods: {
 
@@ -68,32 +83,54 @@
 .flex-container {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
+    display: block;
+    // justify-content: space-between;
+    // flex-direction: row;
+
     padding: var(--default-padding);
 
     .left-wrapper {
+        position: relative;
+        float: left;
         height: 100%;
         border-radius: 4px;
         background-color: var(--color-white);
-        padding: var(--default-padding);
+        margin-right: var(--default-padding);
+        z-index: 100;
     }
     .right-wrapper {
+        position: relative;
         height: 100%;
         border-radius: 4px;
-        margin-left: var(--default-padding);
+        display: flex;
+        flex-direction: column;
+        // flex-grow: 1;
+        overflow: hidden;
+    }
+    
+    .right-wrapper__top {   
+        width: 100%;
+        padding: var(--default-padding);
+        margin-bottom: var(--default-padding);
+        background-color: var(--color-white);
+    }   
+
+    .right-wrapper__bottom {
+        width: 100%;
+        flex-grow: 1;
+        height: 50%;
         background-color: var(--color-white);
     }
 
+
     &.hasBorder {
-        .left-wrapper, .right-wrapper {
+        .left-wrapper, .right-wrapper__top, .right-wrapper__bottom {
             border: solid 1px var(--border-color-base);
         }
     }
 
     &.hasShadow {
-        .left-wrapper, .right-wrapper {
+        .left-wrapper, .right-wrapper__top, .right-wrapper__bottom {
             box-shadow: var(--box-shadow-base);
         }
     }

@@ -27,7 +27,7 @@
                 <el-pagination
                     v-bind="pageAttrs"
                     :current-page.sync="currentPage"
-                    :page-size.sync="size"
+                    :page-size.sync="currentPageSize"
                     :total="total"
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange">
@@ -61,7 +61,7 @@ export default {
             default: 1
         },
 
-        size: {
+        pagesize: {
             type: Number,
             default: 50
         },
@@ -101,12 +101,12 @@ export default {
                 this.$emit('update:page', val)
             }
         },
-        pageSize: {
+        currentPageSize: {
             get() {
-                return this.size
+                return this.pagesize
             },
             set(val) {
-                this.$emit('update:size', val)
+                this.$emit('update:pagesize', val)
             }
         }
     },
@@ -119,7 +119,7 @@ export default {
         },
 
         handleCurrentChange(val) {
-            this.$emit('pagination', { page: val, pageSize: this.pageSize })
+            this.$emit('pagination', { page: val, pageSize: this.currentPageSize })
             if (this.autoScroll) {
                 scrollTo(0, 800)
             }

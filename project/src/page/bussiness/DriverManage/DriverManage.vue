@@ -3,7 +3,10 @@
         <template slot="leftWrapper">
             <ElementTree treeSign="vehicleModel" default-expand-all></ElementTree>
         </template>
-        <template slot="rightWrapper">
+        <template slot="rightTop">
+            您好
+        </template>
+        <template slot="rightBottom">
             <TableAutomatic 
                 :fieldConfig="fieldConfig"
                 :checkedField="checkedField"

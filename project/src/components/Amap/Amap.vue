@@ -25,7 +25,7 @@ export default {
         
     },
     methods: {
-        createMap() {
+        async createMap() {
             this.amapInstance = new AMap.Map(this.$refs['amap'], this.formatOptions);
             await this.$nextTick()
             this.$emit('ready', this.mapInstance)

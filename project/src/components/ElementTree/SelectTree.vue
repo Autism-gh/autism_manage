@@ -250,7 +250,7 @@
             },
 
 
-            async handleClick(data, node) {
+            async handleClick(data) {
                 // 不是选中模式的点击事件不作为
                 if (this.haveCheckBox) return
                 this.selectTree.handleNode = data
@@ -371,7 +371,7 @@
             handleScroll(val) {
                 if(!val) return
                 const $tree = this.$refs['selectTree']
-                $tree.scrollToRightView(heightLightId)
+                $tree.scrollToRightView()
             },
 
 
