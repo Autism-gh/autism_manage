@@ -3,7 +3,7 @@
         <template slot="leftWrapper">
             <ElementTree treeSign="vehicleModel" default-expand-all></ElementTree>
         </template>
-        <template slot="rightWrapper">
+        <template slot="rightBottom">
 
             <el-tabs v-model="activeName" type="border-card">
                 <el-tab-pane label="用户管理" name="first">

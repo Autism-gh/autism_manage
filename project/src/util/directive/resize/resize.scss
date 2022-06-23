@@ -16,8 +16,8 @@
     &__right {
       position: fixed;
       top: 0;
-      right: -8px;
-      width: 8px;
+      right: calc(0px - var(--default-padding));
+      width: var(--default-padding);
       height: 100%;
       cursor: e-resize;
       z-index: 100;
@@ -62,9 +62,9 @@
   
     &__bottom {
       position: fixed;
-      bottom: -8px;
+      bottom: calc(0px - var(--default-padding));;
       left: 0;
-      height: 8px;
+      height: var(--default-padding);
       width: 100%;
       cursor: n-resize;
       z-index: 100;

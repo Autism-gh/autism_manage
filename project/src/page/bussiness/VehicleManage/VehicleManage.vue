@@ -3,7 +3,7 @@
         <template slot="leftWrapper">
             <ElementTree treeSign="vehicleModel" default-expand-all></ElementTree>
         </template>
-        <template slot="rightWrapper">
+        <template slot="rightBottom">
             <TableManual :size="size" :page="page" :total="total" background>
 
                 <template slot="filterLeft">
