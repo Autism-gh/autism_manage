@@ -139,13 +139,25 @@
                         this.errormsg = '没有该用户'
                     }
                 })
+            },
+
+            readyLoadin(event) {
+                var theEvent = event || window.event;
+                var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                if (code == 13) {
+                    this.handleLogin()
+                }
             }
         },
         created() {
 
         },
         mounted() {
+            document.body.addEventListener("keydown", this.readyLoadin);
+        },
 
+        beforeDestroy() {
+            document.body.removeEventListener("keydown", this.readyLoadin);
         },
     };
 

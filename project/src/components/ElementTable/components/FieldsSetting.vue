@@ -91,7 +91,6 @@ export default {
         await $tree.waitForInit
         const formatChecked = checked.map(item => item.field)
         $tree.setCheckedKeys(formatChecked)
-        
         this.pinned = pinned
         this.gridTag = gridTag
         this.checkedFields = checked
@@ -111,8 +110,14 @@ export default {
     async commitSetting() {
       const format = this.checkedFields.map(item => item.field)
       const bindObj = listToObj(this.allFields, 'field')
-      const fields = format.map(item => bindObj[item])
-      await this.$store.dispatch('columns/setColumns', { tag: this.gridTag, fields, pinned: this.pinned })
+      const fields = format.map(item => {
+        const value = bindObj[item]
+        delete value.parent
+        return value
+      })
+
+      const parmas = { tag: this.gridTag, fields, pinned: this.pinned }
+      await this.$store.dispatch('columns/setColumns', parmas)
       this.dialogShow = false
     }
   },

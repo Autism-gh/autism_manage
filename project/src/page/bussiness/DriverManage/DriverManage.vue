@@ -17,6 +17,7 @@
                 :page.sync="page" 
                 :total="total" 
                 :pinned="pinned"
+                :gridTag="gridTag"
                 @pagination="handleChangePageView"
                 @modify="handleModifyEvent"
                 @remove="handleRemoveEvent"

@@ -8,6 +8,7 @@
             <el-tabs v-model="activeName" type="border-card">
                 <el-tab-pane label="用户管理" name="first">
                     <TableAutomatic 
+                        :gridTag="gridTag[0]"
                         :fieldConfig="fieldConfig[gridTag[0]]"
                         :checkedField="checkedField[gridTag[0]]"
                         :tableData="table.first"
@@ -60,6 +61,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="配置管理" name="second">
                     <TableAutomatic 
+                        :gridTag="gridTag[1]"
                         :fieldConfig="fieldConfig[gridTag[1]]"
                         :checkedField="checkedField[gridTag[1]]"
                         :tableData="table.second"

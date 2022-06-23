@@ -63,6 +63,9 @@
                         <template v-if="item.components">  
                             <slot :data="row" :name="`table-${item.components}`"></slot>
                         </template> 
+                        <template v-else-if="item.formatter">
+                            {{ item.formatter({ row, value: row[item.field] }) }}
+                        </template>
                         <template v-else>
                             {{ row[item.field] }}
                         </template>
@@ -70,9 +73,13 @@
 
                 </el-table-column>
 
-                <el-table-column fixed="right" label="操作" width="100" align="center">
+                <el-table-column fixed="right" label="操作" :width="manageColumn.length * 40" align="center">
                     <template slot-scope="{ row }">
-                        <i @click.stop="handleEmitEvent(item, row)" class="element-table-icon" v-for="item in manageColumn" :key="item.event" :class="item.icon"></i>
+                        <i @click.stop="handleEmitEvent(item, row)" 
+                            class="element-table-icon" 
+                            v-for="item in manageColumn" 
+                            :key="item.event" :class="item.icon">
+                        </i>
                     </template>
                 </el-table-column>
 
@@ -96,6 +103,8 @@
         </div>
 
         <FieldsSetting ref="FieldsSetting"></FieldsSetting>
+
+        <slot></slot>
     </div>
 </template>
 
@@ -115,8 +124,8 @@ export default {
             type: Object,
             default: function() {
                 return {
-                    // pageSizes: [30, 50, 100, 150, 200],
-                    pageSizes: [2, 3, 4, 5, 6],
+                    pageSizes: [30, 50, 100, 150, 200],
+                    // pageSizes: [2, 3, 4, 5, 6],
                     layout: 'total, sizes, prev, pager, next, jumper',
                 }
             }
@@ -201,7 +210,7 @@ export default {
         }
 
     },
-    name: '',
+    name: 'TableAutomatic',
     data() {
         return {
             showMore: false
@@ -239,15 +248,25 @@ export default {
         },
 
         formatFieldsConfig() {
-            return this.fieldConfig.map((item, index) => {
-                const { width, minWidth, align } = item
-                return Object.assign(item, {
-                    fixed: index < (this.pinned - this.preColumns.length),
-                    width: width || 150,
-                    minWidth: minWidth || 150,
-                    align: align || 'center'
+            // 这些都是配好的
+            if(this.checkedField?.length) {
+                return this.checkedField.map((item, index) => {
+                    return Object.assign(item, {
+                        fixed: index < (this.pinned - this.preColumns.length),
+                    })
                 })
-            })
+            } else {
+                // 没配好的可能还没格式化
+                return this.fieldConfig.map((item, index) => {
+                    const { width, minWidth, align } = item
+                    return Object.assign(item, {
+                        fixed: index < (this.pinned - this.preColumns.length),
+                        width: width,
+                        minWidth: minWidth || 120,
+                        align: align || 'center'
+                    })
+                })
+            }
         }
     },
     methods: {
@@ -281,6 +300,10 @@ export default {
 
         reflash() {
             this.$refs['automaticstable'].doLayout()
+        },
+
+        getCheckedRows() {
+            return this.$refs['automaticstable'].selection
         }
     },
     created() {

@@ -1,5 +1,5 @@
-import store from '@/store'
 
+import store from '@/store'
 /**
  * 
  *  { name: '修改', icon: 'el-icon-edit-outline', event: 'modify' },
@@ -45,20 +45,24 @@ const mixin = {
 
     async beforeMount() {
         await this.getColumns(this.gridTag)
-
+        
+        const formatTag = `${ store.state.columns.prefix }__${this.gridTag}`
         this.$watch(() => {
-            return this.$store.getters.columnsSettings[this.gridTag]
+            return this.$store.getters.columnsSettings[formatTag]
         }, (val) => {
-            this.pinned = val.pinned
-            this.checkedField = val.fields
+            const { pinned, fields } = val
+            this.pinned = pinned
+            this.checkedField = fields
         })
     },
 
     methods: {
         async getColumns(tag) {
             const res = await store.dispatch('columns/getColumns', tag)
-            this.pinned = res?.pinned || 2
-            this.checkedField = res?.fields && res?.fields?.length || this.fieldConfig
+
+            const { pinned, fields } = res
+            this.pinned = pinned
+            this.checkedField = fields
         }
     }
 }
