@@ -22,3 +22,13 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### Loder error
+rm -rf node_modules/
+
+rm package-lock.json
+
+npm cache verify
+
+npm i && npm up

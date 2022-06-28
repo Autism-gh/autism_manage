@@ -26,6 +26,14 @@ const mapRouter = {
             meta: {
                 title: '轨迹回放'
             }
+        },
+        {
+            path: 'videoback',
+            component: () => import('@/page/map/VideoBack/VideoBack'),
+            name: 'VideoBack',
+            meta: {
+                title: '视频回放'
+            }
         }
     ]
 }

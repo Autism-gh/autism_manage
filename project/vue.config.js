@@ -11,6 +11,8 @@ const resolve = (dir) => {
     return path.join(__dirname, dir)
 }
 
+// const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
 const getIPAdress = () => {
     var interfaces = require('os').networkInterfaces()
     for (var devName in interfaces) {
@@ -86,5 +88,18 @@ module.exports = {
     // eslint-disable-next-line no-dupe-keys
     configureWebpack: config => {
         config.externals = assetsCDN.externals;
-    }
+    },
+
+    // module: {
+    //     rules: [
+    //         {
+    //             test: /\.vue$/,
+    //             loader: 'vue-loader'
+    //         }
+    //     ]
+    // },
+
+    // plugins: [
+    //     new VueLoaderPlugin()
+    // ]
 }
