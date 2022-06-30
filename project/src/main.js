@@ -7,10 +7,14 @@ import store from './store'
 // 验证用户操作路由
 import './checkuser'
 
+import './property'
+
+import './components'
+
+import './element'
+
 // 开启日志监控
 import '@/util/app/error.log.js'
-
-import './property'
 
 import '@/style/common/index.scss' // global css
 

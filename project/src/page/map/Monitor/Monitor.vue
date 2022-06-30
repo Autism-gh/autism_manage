@@ -1,10 +1,13 @@
 <template>
-    <div>实时监控</div>
+    <LeafletMap></LeafletMap>
 </template>
 
 <script>
+// import L from '@/components/Leaflet/index'
+import LeafletMap from '@/components/Leaflet/LeafletMap.vue'
+
 export default {
-    components: {  },
+    components: { LeafletMap },
     props: {  },
     name: 'Monitor',
     data() {

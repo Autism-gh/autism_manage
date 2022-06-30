@@ -1,3 +1,4 @@
+import axios from 'axios'
 import PinyinMatch from 'pinyin-match'
 
 
@@ -6,31 +7,9 @@ import PinyinMatch from 'pinyin-match'
  * https://console.amap.com/dev/index
  */
 
-
-import { geo2coord } from './mapBaiduGeoTrans'
-import { gcj02towgs84, gcj02tobd09 } from './coordinateChange'
 const gaodeCityCode = require('./mapGaodeCityCode.json')
 
-
 const gaodekeyLLQ = '8678d946c69dff3fe9090aaf2cc090c7'
-
-
-/**
- * 该值为本页面默认返回坐标系类型
- * 后面可以直接对上 vuex 内系统坐标系类型
- * bd09  百度
- * gcj02 高德 / 谷歌
- * wgs84 大地 / 天地图（国标）
- */
-const returnCoordinate = 'gcj02' 
-
-
-/**
- * 返回得list类型得坐标点 先后顺序
- * true:  latlng
- * false: lnglat
- */
-const returnLatlngSort = 'latlng'
 
 
 
@@ -60,17 +39,14 @@ export const getCityWeatherBorderGaode = (cityName) => {
             citycode = getCode[0].city_code
         }
         let getpath = `https://restapi.amap.com/v3/weather/weatherInfo?city=${ citycode }&key=${ gaodekeyLLQ }`
-        $.ajax({
-            url: getpath,
-            type: "GET",
-            dataType: "jsonp",
-            success: (res) => {
-                if(!res || +res.status != 1) {
-                    resolve(res.info)
-                    return
-                }
-                resolve(res.lives)
+
+        axios.get(getpath).then(res => {
+            const { status, info, lives } = res?.data || {}
+            if(!status || status != '1') {
+                resolve(info)
+                return
             }
+            resolve(lives)
         }).catch(e => {
             reject(new Error(e))
         })
@@ -87,18 +63,14 @@ export const getCityWeatherBorderGaode = (cityName) => {
 export const getUserAddressByIP = (ip) => {
     return new Promise((resolve, reject) => {
         let v3path = `https://restapi.amap.com/v3/ip?ip=${ ip }&output=json&key=${ gaodekeyLLQ }`
-        let v5path = `https://restapi.amap.com/v5/ip?ip=${ ip }&output=json&key=${ gaodekeyLLQ }&type=ipv4`
-        $.ajax({
-            url: v3path,
-            type: "GET",
-            dataType: "jsonp",
-            success: (res) => {
-                if(!res || +res.status != 1) {
-                    resolve(res.info)
-                    return
-                }
-                resolve(res)
+
+        axios.get(v3path).then(res => {
+            const { status, info } = res?.data || {}
+            if(!status || status != '1') {
+                resolve(info)
+                return
             }
+            resolve(res?.data)
         }).catch(e => {
             reject(new Error(e))
         })
@@ -107,4 +79,25 @@ export const getUserAddressByIP = (ip) => {
 
 
 
+export const getAddressByLnglat = ({ lng, lat, radius = 1000 }, format = true) => {
+    return new Promise((resolve, reject) => {
+        let v3path = `https://restapi.amap.com/v3/geocode/regeo?output=json&location=${lng},${lat}&key=${ gaodekeyLLQ }&radius=${ radius }&extensions=all`
 
+        axios.get(v3path).then(res => {
+            const { status, info } = res?.data || {}
+            if(!status || status != '1') {
+                resolve(info)
+                return
+            }
+
+            if(format) {
+                const { formatted_address, addressComponent } = res?.data?.regeocode
+                resolve({ formatted_address, addressComponent })
+            } else {
+                resolve(res?.data)
+            }
+        }).catch(e => {
+            reject(new Error(e))
+        })
+    })
+}
