@@ -1,5 +1,8 @@
 <template>
     <div class="popup-wrapper">
+        <div class="popup-close" @click="close">
+            <i class="el-icon-close"></i>
+        </div>
         <slot></slot>
     </div>
 </template>
@@ -22,7 +25,7 @@ export default {
     props: {
         className: {
             type: String,
-            default: 'custom'
+            default: 'custom-popup'
         },
         maxWidth: {             // 最大像素
             type: Number,
@@ -46,11 +49,15 @@ export default {
         },
         closeOnClick: {
             type: Boolean,
-            default: true
+            default: false
         },
         closeOnMove: {
             type: Boolean,
-            default: true
+            default: false
+        },
+        closeButton: {
+            type: Boolean,
+            default: false
         },
         offset: {
             type: Array,
@@ -69,6 +76,7 @@ export default {
                 autoPan: this.autoPan,
                 keepInView: this.keepInView,
                 autoClose: this.autoClose,
+                closeButton: this.closeButton,
                 closeOnClick: this.closeOnClick,
                 offset: this.offset
             })
@@ -81,7 +89,7 @@ export default {
             if(marker instanceof L.Marker) {
                 this.visible = true
                 this.removeListener()
-                marker.on('disappear',this.close)
+                marker.on('remove',this.close)
 
                 if(this.closeOnMove) {
                     marker.on('move',this.positionChangedListener)
@@ -96,7 +104,7 @@ export default {
         },
         removeListener() {
             if (this.currentMarker) {
-                this.currentMarker.off('disappear',this.close)
+                this.currentMarker.off('remove',this.close)
                 this.currentMarker.off('move',this.positionChangedListener)
                 this.currentMarker = null
             }
@@ -117,6 +125,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.popup-wrapper {
+    position: relative;
+    padding: 10px 15px;
 
+    .popup-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        cursor: pointer;
+        z-index: 10;
+    }
+}
 </style>
 

@@ -1,4 +1,4 @@
-import L from '@/components/Leaflet/index'
+import L from '@/components/Leaflet/leaflet'
 
 /**
  * 
@@ -7,7 +7,7 @@ import L from '@/components/Leaflet/index'
  */
 
 class DrawTool {
-    constructor(map) {
+    constructor(map, callBack) {
         // 地图实例
         this.mapInstance = map
 
@@ -15,16 +15,22 @@ class DrawTool {
 
         this.featureGroup = null
 
+        this.callBack = callBack
+
         this.activeDrawer = null
-        // 状态
-        this.isDraw = false
+        // 开启状态
+        this.enable = false
+        // 图形已存在
+        this.isDrawed = false
         // 类型
         this.type = null
         // 配置信息
         this.options = null
     }
 
-    create() {
+    create(type = true) {
+        this.enable = true
+
         // 存储可编辑图层
         this.featureGroup = new L.FeatureGroup()
         this.mapInstance.addLayer(this.featureGroup)
@@ -41,29 +47,38 @@ class DrawTool {
 
             Marker: new L.Draw.Marker(this.mapInstance, {shapeOptions: {weight:3,fillOpacity:0.35}}),
 
+            Measure: new L.Polyline.Measure(this.mapInstance),
+
             Edit: new L.EditToolbar.Edit(this.mapInstance, {featureGroup: this.featureGroup}),
 
             Delete: new L.EditToolbar.Delete(this.mapInstance, {featureGroup: this.featureGroup})
         }
+        
 
-        this.mapInstance.on(L.Draw.Event.CREATED, (event) => {
-            const { layer } = event
-            this.isDraw = true
-            this.featureGroup.addLayer(layer)
-        })
+        if(type) {
+            this.mapInstance.on(L.Draw.Event.CREATED, (event) => {
+                const { layer } = event
+                this.isDrawed = true
+                if(this.callBack) {
+                    this.callBack(event)
+                } else {
+                    this.featureGroup.addLayer(layer)
+                }
+            })
+        }
     }
 
     addLayer({ layer, type, options }) {
         this.type = type
         // 清空已有
-        if(this.isDraw) {
+        if(this.isDrawed) {
             this.clear()
         }
 
         if(options) this.options = options
 
         if(layer) {
-            this.isDraw = true
+            this.isDrawed = true
             this.featureGroup.addLayer(layer)
             const bounds = this.featureGroup.getBounds()
             this.mapInstance.setBounds(bounds)
@@ -79,7 +94,7 @@ class DrawTool {
         this.options = options
 
         // 清空已有
-        if(this.isDraw) {
+        if(this.isDrawed) {
             this.clear()
         }
 
@@ -103,7 +118,7 @@ class DrawTool {
     }
 
     stopEdit() {
-        this.isDraw = false
+        this.isDrawed = false
         this.drawControl && this.drawControl.Edit.disable()
     }
 
@@ -113,7 +128,7 @@ class DrawTool {
 
     clear() {
         if(this.featureGroup) this.featureGroup.clearLayers()
-        this.isDraw = false
+        this.isDrawed = false
     }
 
     getLayer() {
@@ -149,8 +164,14 @@ class DrawTool {
     }
 
     destroyed() {
-        if(this.featureGroup) this.featureGroup.clearLayers()
+        this.stopDraw()
+        this.stopEdit()
+        if(this.featureGroup) {
+            this.featureGroup.clearLayers()
+            this.featureGroup.remove()
+        }
         this.mapInstance.off('click', L.Draw.Event.CREATED);
+        this.enable = false
     }
 }
 

@@ -4,29 +4,59 @@
 
     <!-- 右上角控制器 -->
     <div class="leaflet-control-container">
-      <div class="control-row bg" v-show="control.show">
+      <div class="left_top_control bg" v-show="control.show">
         <div class="row" @click="addNewView"><IconBtn icon="el-icon-aim" title="我的视野"></IconBtn></div>
-        <div class="row" @click="startMeasureEvent"><IconBtn icon="el-icon-sugar" title="距离测量"></IconBtn></div>
+        <div class="row" @click="startMeasureControl"><IconBtn icon="el-icon-sugar" title="距离测量"></IconBtn></div>
         <div class="row" @click="startDrawControl"><IconBtn icon="el-icon-map-location" title="采集位置"></IconBtn></div>
-        <div class="row"><IconBtn icon="el-icon-view" title="显示控制"></IconBtn></div>
+        <div class="row">
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              <IconBtn icon="el-icon-view" title="显示控制"></IconBtn>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-checkbox-group v-model="control.selectList" @change="controlChange">
+                <div class="custom-drop-row" v-for="item in control.list" :key="item.key" >
+                  <el-checkbox 
+                    :label="item.key">
+                    {{ item.name }}
+                  </el-checkbox>
+                </div>
+              </el-checkbox-group>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
       </div>
-      <div class="box-btn" @click="control.show = !control.show">
+      <div class="right_top_btn" @click="control.show = !control.show">
         <i class="el-icon-menu"></i>
       </div>
     </div>
 
     <!-- 左上角查询 -->
-    <MapSearch ref="mapsearch"></MapSearch>
+    <MapSearch v-if="control.searchSwitch" ref="mapsearch"></MapSearch>
+
+    <MapPopup ref="addressCollect" :minWidth="250" :offset="[0, -20]">
+        <div class="address_popup">
+            <li><span>经度:</span><span>{{ address.result.lng }}</span></li>
+            <li><span>维度:</span><span>{{ address.result.lat }}</span></li>
+            <li><span>地址:</span><span>{{ address.result.address }}</span></li>
+        </div>
+    </MapPopup>
+
+    <div class="leaflet-bottom-address" v-show="bottomaddress"><span>{{ bottomaddress }}</span></div>
 
   </div>
 </template>
 <script>
-import L from './index'
+import L from './leaflet'
 import MapSearch from './components/MapSearch.vue'
-import DrawTool from './util/DrawTool'
+import MapPopup from './components/MapPopup.vue'
+import DrawTool from './util/drawcenter'
+import mapmixin from './mapmixin'
+import { acctiveMap } from './maputils'
 export default {
   name: '',
-  components: { MapSearch },
+  components: { MapSearch, MapPopup },
+  mixins: [mapmixin],
   props: {  
     propOptions: {
       type: Object,
@@ -48,19 +78,7 @@ export default {
         mapInstance: null,
 
         mapTitleLayer: null,
-
-        scaleLayer: null,
-
-
-        control: {
-          show: true,
-          list: [],
-          map: []
-        },
-
-        drawTool: null,
-
-
+        
         waitForInit: null,
 
         promiseResolve: null,
@@ -81,66 +99,50 @@ export default {
     }
   },
   methods: {
-    readyMap() {
-      // 比例尺
-      this.scaleLayer = L.control.scale({imperial: false })
-    },
 
+    /**
+     * 
+     * 生成地图的
+     * 
+     */
     generateMap() {
         this.mapInstance = L.map(this.$refs['leafletref'] , this.formatOptions)
-
-        this.mapTitleLayer = L.tileLayer.chinaProvider(
-            'GaoDe.Normal.Map', { 
+        this.mapTitleLayer = L.tileLayer.chinaProvider(acctiveMap, { 
             maxZoom:18, minZoom:3
         }).addTo(this.mapInstance);
-
         
+        this.addControOnMap()
         this.reflashMap()
         this.promiseResolve(this.mapInstance)
         this.$emit('ready', this.mapInstance)
-
-        this.changeScale(true)
     },
 
+    addControOnMap() {
+      // 测距
+      this.polylineMeasure = new L.Polyline.Measure(this.mapInstance)
 
-    changeMapLayer() {
+      // 生成好绘图工具箱
+      this.drawToolInstane = new DrawTool(this.mapInstance, this.handleDrawCallBack)
 
-    },
+      // 坐标采集的框框
+      this.address.popup = this.$refs['addressCollect'].init(this.mapInstance)
 
-
-    startDrawControl() {
-      if(!this.drawTool) {
-        this.drawTool = new DrawTool(this.mapInstance)
-        this.drawTool.create()
+      if(this.control.selectList) {
+        this.control.selectList.forEach(item => {
+          this.changeCurrentControl(item, true)
+        })
       }
-      this.drawTool.draw('Circle')
     },
-
-    startMeasureEvent() {
-      this.drawTool.draw('Rectangle')
-    },
-
     
-    addNewView() {
-      const parmas = this.drawTool.getParmas()
-      console.log('parmas', parmas)
-    },
-
-    changeScale(type) {
-      if(type) {
-        this.scaleLayer.addTo(this.mapInstance)
-      } else {
-        this.scaleLayer.remove()
-      }
-    },
-
     reflashMap() {
         if(this.mapInstance) this.mapInstance.invalidateSize()
     },
 
+
     distoryMap() {
         if(this.mapInstance) this.mapInstance.remove()
     },
+
   },
   beforeCreate () {
 
@@ -154,23 +156,35 @@ export default {
 
   },
   mounted () {
-    this.readyMap()
     this.generateMap()
+    this.addControOnMap()
   },
+
   beforeDestroy() {
+    this.address.popup && this.address.popup.off('popupclose', this.clearPopupMarker)
+    this.drawToolInstane.destroyed()
     this.distoryMap()
   },
+
   activated() {
     this.reflashMap()
   },
 }
 </script>
+<style lang="scss">
+.custom-drop-row {
+  padding: 0 8px;
+  line-height: 20px;
+}
+</style>
+
 <style lang="scss" scoped>
 @import './scss/leaflet-custom.scss';
 .leaflet-container {
     position: relative;
     width: 100%;
     height: 100%;
+    font-size: 12px;
 }
 
 .leaflet-center {

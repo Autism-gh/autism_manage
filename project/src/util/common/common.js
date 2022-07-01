@@ -121,3 +121,10 @@ export const listToObj = (list, key) => {
     })
     return result
 }
+
+
+export const getArrayDifference = (list, whole) => {
+    return list.concat(whole).filter((v, i, arr) => {
+        return arr.indexOf(v) === arr.lastIndexOf(v)
+    })
+}

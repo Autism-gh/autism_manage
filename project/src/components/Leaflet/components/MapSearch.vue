@@ -1,20 +1,23 @@
 <template>
   <div class="leaflet-search-container">
       <div class="address bg"  @click="search.show = !search.show">
-        <span>滨江区</span>
+        <span>{{ search.value.name }}</span>
         <i :class="[search.show? 'el-icon-arrow-up': 'el-icon-arrow-down']"></i>
       </div>
       <div class="address-content bg" v-show="search.show">
         <div class="address-row">
             <div class="title">常用城市</div>
             <div class="content">
-                <span class="city" v-for="item in search.common" :key="item.city_code">{{ item.chinese_name }}</span>
+                <span class="city" v-for="item in search.common" :key="item.city_code" @click="handleChangeHot(item)">
+                  {{ item.chinese_name }}
+                </span>
             </div>
         </div>
         <div class="address-row">
             <div class="title">选择城市</div>
             <div class="content">
               <el-cascader
+                @change="handleChangeCenter"
                 style="width: 100%"
                 placeholder="试试搜索：指南"
                 :options="search.list"
@@ -41,14 +44,13 @@
           </el-select>
           <el-button type="primary" icon="el-icon-search"></el-button>
       </div>
-      <div class="search-content bg">
-
-      </div>
   </div>
 </template>
 <script>
+import L from '../leaflet'
 import { regionData } from "element-china-area-data"
 import { hotCityList } from '../util/hotcity'
+const GaodeCityInfo = require('@/util/map/mapGaodeCityInfo.json')
 export default {
   name: '',
   components: {  },
@@ -67,24 +69,69 @@ export default {
         loading: false,
         list: [],
         value: ''
-      }
+      },
+
+      mapInstance: null,
+
+      featureGroup: null
     }
   },
   computed: {
 
   },
   methods: {
+    init(map) {
+      this.mapInstance = map
+      this.mapInstance = new L.FeatureGroup().addTo(this.mapInstance)
+
+      
+    },
+
+
     remoteMethod(query) {
       if (query !== '') {
         this.address.loading = true;
         setTimeout(() => {
+          console.log('query', query)
           this.address.loading = false;
           this.address.options = []
         }, 200);
       } else {
         this.address.options = [];
       }
+    },
+
+    handleChangeCenter(data) {
+      const code = data[data.length - 1]
+      const acdtive = GaodeCityInfo.find(item => item.city_code === code)
+      this.handleChangeHot(acdtive)
+    },
+
+    handleChangeHot(item) {
+      const { chinese_name, center, city_code } = item
+      this.search.value = {
+        name: chinese_name,
+        code: city_code,
+        center: center
+      }
+
+      if(center) {
+        this.setCurrentView(center)
+      }
+    },
+
+    setCurrentView(latlng, zoom = 16) {
+      this.mapInstance.setView(L.latLng(latlng), zoom)
+    },
+
+    cleanLayer() {
+      if(this.featureGroup) {
+        this.featureGroup.clearLayers()
+        this.featureGroup.remove()
+        this.featureGroup = null
+      }
     }
+
   },
   beforeCreate () {
 
@@ -96,10 +143,10 @@ export default {
 
   },
   mounted () {
-    // console.log('regionData', regionData)
+
   },
   beforeDestroy() {
-
+    this.cleanLayer()
   },
 }
 </script>
@@ -186,11 +233,6 @@ export default {
     height: max-content;
     width: max-content;
     margin-left: var(--default-padding);
-  }
-  .search-content {
-    position: absolute;
-    top: 30px;
-    z-index: 10;
   }
 }
 </style>

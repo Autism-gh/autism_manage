@@ -101,3 +101,30 @@ export const getAddressByLnglat = ({ lng, lat, radius = 1000 }, format = true) =
         })
     })
 }
+
+
+export const getCityCenter = (citycode, cityName) => {
+    return new Promise((resolve, reject) => {
+        let v3path = `https://restapi.amap.com/v3/geocode/geo?city=${citycode}&address=${ cityName }公安局&output=json&key=${ gaodekeyLLQ }`
+
+        axios.get(v3path).then(res => {
+
+            const { status } = res
+            if(!status || status !=  200 ||  !res?.data) return
+            const { status: apistate } = res.data
+            if(apistate !== '1') return
+
+            const { geocodes } = res?.data
+            
+            if(geocodes && geocodes.length) {
+                const {location} = geocodes?.[0]
+                const latlng = location.split(',')
+                resolve([latlng[0], latlng[1]])
+            } else {
+                resolve([])
+            }
+        }).catch(e => {
+            reject(new Error(e))
+        })
+    })
+}

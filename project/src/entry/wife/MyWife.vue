@@ -32,14 +32,14 @@ export default {
     },
 
     watch: {
-        modelId(newVal) {
+        modelId() {
             this.changeWifeClothes()
         }  
     },
 
     mounted() { 
         if(!loadlive2d) {
-            this.$warning('live2d 加载失败')
+            // this.$warning('live2d 加载失败')
             return
         }
         

@@ -1,50 +1,84 @@
-
 //  控制器
 .leaflet-control-container {
-    position: absolute;
-    right: var(--default-padding);
-    top: var(--default-padding);
-    z-index: 1000;
-    font-size: 12px;
+  position: absolute;
+  right: var(--default-padding);
+  top: var(--default-padding);
+  z-index: 1000;
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+
+  .bg {
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow-base);
+    border-radius: 4px;
+  }
+
+  .left_top_control {
     display: flex;
-    flex-direction: row;
-  
-    .bg {
-      background-color: var(--color-white);
-      box-shadow: var(--box-shadow-base);
-      border-radius: 4px;
-    }
-  
-    .control-row {
-      display: flex;
-      margin-right: var(--default-padding);
-  
-      .row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        cursor: pointer;
-        border: solid 1px var(--border-color-base);
-  
-  
-        i {
-          font-size: 16px;
-        }
-      }
-    }
-  
-    .box-btn {
+    margin-right: var(--default-padding);
+
+    .row {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 28px;
       height: 28px;
-      font-size: 18px;
-      background-color: var(--color-primary);
-      color: #FFFFFF;
-      border-radius: 4px;
       cursor: pointer;
+      border: solid 1px var(--border-color-base);
+
+
+      i {
+        font-size: 16px;
+      }
     }
   }
+
+  .right_top_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    background-color: var(--color-primary);
+    color: #FFFFFF;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}
+
+
+.leaflet-container {
+  .address_popup {
+    li {
+      line-height: 24px;
+
+      span {
+        &:first-of-type {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+
+  .leaflet-bottom-address {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    bottom: -30px;
+    height: 30px;
+
+    span {
+      background-color: var(--color-white);
+      box-shadow: var(--box-shadow-base);
+      position: absolute;
+      top: -20px;
+      padding: 2px 5px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+  }
+}

@@ -39,6 +39,18 @@ import './lib/Leaflet.draw-cn.js'
 import 'leaflet-draw/dist/leaflet.draw.css'
 
 
+
+/**
+ * 测距
+ */
+import './lib/Leaflet-Polylinemeasure'
+
+/**
+ * 鹰眼地图
+ */
+import 'leaflet-minimap'
+import 'leaflet-minimap/dist/Control.MiniMap.min.css'
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
