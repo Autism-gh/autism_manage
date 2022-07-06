@@ -82,6 +82,8 @@ export default {
         waitForInit: null,
 
         promiseResolve: null,
+
+        observerInstance: null,
     }
   },
   computed: {
@@ -158,10 +160,16 @@ export default {
   mounted () {
     this.generateMap()
     this.addControOnMap()
+
+    this.observerInstance = new ResizeObserver(() => this.reflashMap())
+    this.observerInstance.observe(this.$refs['leafletref'])
   },
 
   beforeDestroy() {
-    this.address.popup && this.address.popup.off('popupclose', this.clearPopupMarker)
+    if(this.observerInstance) {
+      this.observerInstance.unobserve(this.$refs['leafletref'])
+      this.observerInstance = null
+    }
     this.drawToolInstane.destroyed()
     this.distoryMap()
   },

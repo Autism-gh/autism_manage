@@ -82,7 +82,7 @@ export default {
   methods: {
     init(map) {
       this.mapInstance = map
-      this.mapInstance = new L.FeatureGroup().addTo(this.mapInstance)
+      this.featureGroup = new L.FeatureGroup().addTo(this.mapInstance)
 
       
     },

@@ -81,7 +81,7 @@ class DrawTool {
             this.isDrawed = true
             this.featureGroup.addLayer(layer)
             const bounds = this.featureGroup.getBounds()
-            this.mapInstance.setBounds(bounds)
+            this.mapInstance.fitBounds(bounds)
         }
     }
 
