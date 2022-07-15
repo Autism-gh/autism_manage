@@ -60,7 +60,11 @@ export default {
                 map: []
             },
 
-            bottomaddress: '',
+            bottomaddress: {
+                format: '',
+                active: '',
+                detail: {}
+            },
         }
     },
 
@@ -123,7 +127,7 @@ export default {
                 this.mapInstance.on('zoomend', this.changeCenterAddress)
                 this.mapInstance.on('moveend', this.changeCenterAddress)
             } else {
-                this.bottomaddress = ''
+                this.bottomaddress = { format: '', active: '' }
                 this.mapInstance.off('zoomend', this.changeCenterAddress)
                 this.mapInstance.off('moveend', this.changeCenterAddress)
             }
@@ -159,7 +163,7 @@ export default {
             } else if (zoom >= 14) {
                 result = formatted_address
             }
-            this.bottomaddress = result
+            this.bottomaddress = {result, active: district || township}
         },
 
 

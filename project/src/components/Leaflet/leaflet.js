@@ -45,6 +45,24 @@ import 'leaflet-draw/dist/leaflet.draw.css'
  */
 import './lib/Leaflet-Polylinemeasure'
 
+
+
+/**
+ * 线段上带点东西
+ */
+import 'leaflet-polylinedecorator'
+
+
+import './lib/Leaflet.LayerCollision'
+
+
+/**
+ * marker 动画
+ */
+// import './lib/Leaflet-AnimatedMarker'
+// import './lib/Leaflet-AnimatedMarkerNew'
+
+
 /**
  * 鹰眼地图
  */

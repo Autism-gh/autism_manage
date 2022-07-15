@@ -32,7 +32,7 @@
     </div>
 
     <!-- 左上角查询 -->
-    <MapSearch v-if="control.searchSwitch" ref="mapsearch"></MapSearch>
+    <MapSearch v-if="control.searchSwitch" ref="mapsearch" :area="bottomaddress.active"></MapSearch>
 
     <MapPopup ref="addressCollect" :minWidth="250" :offset="[0, -20]">
         <div class="address_popup">
@@ -42,8 +42,9 @@
         </div>
     </MapPopup>
 
-    <div class="leaflet-bottom-address" v-show="bottomaddress"><span>{{ bottomaddress }}</span></div>
+    <div class="leaflet-bottom-address" v-show="bottomaddress"><span>{{ bottomaddress.format }}</span></div>
 
+    <slot></slot>
   </div>
 </template>
 <script>

@@ -2,7 +2,7 @@
   <div class="leaflet-search-container">
       <div class="address bg"  @click="search.show = !search.show">
         <span>{{ search.value.name }}</span>
-        <i :class="[search.show? 'el-icon-arrow-up': 'el-icon-arrow-down']"></i>
+        <i :class="[search.show? ' el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
       </div>
       <div class="address-content bg" v-show="search.show">
         <div class="address-row">
@@ -54,7 +54,12 @@ const GaodeCityInfo = require('@/util/map/mapGaodeCityInfo.json')
 export default {
   name: '',
   components: {  },
-  props: {  },
+  props: {  
+    area: {
+      type: [String, Array],
+      default: ''
+    }
+  },
   data () {
     return {
       search: {
@@ -78,6 +83,12 @@ export default {
   },
   computed: {
 
+  },
+  watch: {
+    'area': function(newVal) {
+      if(!newVal || Array.isArray(newVal)) return
+      this.search.value = { name: newVal }
+    }
   },
   methods: {
     init(map) {
