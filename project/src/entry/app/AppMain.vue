@@ -18,7 +18,30 @@ export default {
     key() {
       return this.$route.path
     }
-  }
+  },
+  provide() {
+    return {
+      pageReload: this.reload
+    }
+  },
+
+  
+  methods: {
+    reload(){
+      const route = this.$route
+      const { fullPath, path, name, meta, meta: { title } } = route
+      const parmas = {fullPath, meta, name, path, title}
+
+      this.$store.dispatch('tagsView/delCachedView', parmas).then(() => {
+          const { fullPath } = parmas
+          this.$nextTick(() => {
+              this.$router.replace({
+                  path: '/redirect' + fullPath
+              })
+          })
+      })
+    }
+  },
 }
 </script>
 

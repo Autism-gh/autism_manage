@@ -19,6 +19,17 @@ import Layout from '@/entry/Index'
  */
 export const constantRoutes = [
     {
+        path: '/redirect',
+        component: Layout,
+        hidden: true,
+        children: [
+            {
+                path: '/redirect/:path(.*)',
+                component: () => import('@/page/common/Redirect')
+            }
+        ]
+    },
+    {
         path: '/login',
         component: () => import('@/entry/Login'),
         hidden: true
