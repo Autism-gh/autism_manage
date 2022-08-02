@@ -3,6 +3,11 @@
         <template slot="leftWrapper">
             <ElementTree treeSign="vehicleModel" default-expand-all></ElementTree>
         </template>
+
+        <template slot="rightTop">
+            <span>卧槽牛皮</span>
+        </template>
+
         <template slot="rightBottom">
             <TableManual :size="size" :page="page" :total="total" background>
 
@@ -76,7 +81,7 @@
 
 <script>
     import ElementTree from '@/components/ElementTree/ElementTree'
-    import FlexContainer from '@/components/Layout/FlexContainer'
+    import FlexContainer from '@/components/Layout/flexContainer2.vue'
     import TableManual from '@/components/ElementTable/TableManual'
     import { tableOptions, defaultData } from './components/fieldConfig'
     export default {

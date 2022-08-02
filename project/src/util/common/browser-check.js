@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export const isIE = function () {
     return !Vue.prototype.$isServer && !isNaN(Number(document.documentMode));
 };

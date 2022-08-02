@@ -117,7 +117,7 @@
 
     .right-wrapper__bottom {
         width: 100%;
-        flex-grow: 1;
+        flex: 1;
         height: 50%;
         background-color: var(--color-white);
     }

@@ -59,6 +59,9 @@
 
             </TableAutomatic>
         </template>
+
+        <PictureView v-show="picture.show" :url-list="picture.urlList" :on-close="() => picture.show = false" />
+
     </FlexContainer>
 </template>
 
@@ -66,7 +69,7 @@
     import ElementTree from '@/components/ElementTree/ElementTree'
     import FlexContainer from '@/components/Layout/FlexContainer'
     import {TableAutomatic, SearchPanel} from '@/components/ElementTable'
-
+    import PictureView from '@/components/PictureView/PictureView.vue'
 
     import { tableOptions, defaultData } from './components/fieldConfig'
     import singletable from '@/util/mixins/singletable'
@@ -75,7 +78,8 @@
             FlexContainer,
             TableAutomatic,
             ElementTree,
-            SearchPanel
+            SearchPanel,
+            PictureView
         },
         props: {},
         mixins: [singletable],
@@ -94,7 +98,12 @@
 
                 tableData: defaultData,
 
-                fieldConfig: tableOptions
+                fieldConfig: tableOptions,
+
+                picture: {
+                    show: false,
+                    urlList: []
+                }
             };
         },
         watch: {
@@ -125,8 +134,12 @@
                 console.log('handleClickRow', row)
             },
 
-            handleEmitExtandEvent(row) {
-                console.log('handleEmitExtandEvent', row)
+            handleEmitExtandEvent() {
+                this.picture.urlList = ['https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg']
+
+                this.picture.show = true
+
+                // console.log('handleEmitExtandEvent', row)
             },
 
             handleGetTableData() {
