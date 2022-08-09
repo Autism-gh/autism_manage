@@ -13,18 +13,18 @@ const resolve = (dir) => {
 
 // const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
-const getIPAdress = () => {
-    var interfaces = require('os').networkInterfaces()
-    for (var devName in interfaces) {
-        var iface = interfaces[devName]
-        for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i]
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-                return alias.address
-            }
-        }
-    }
-}
+// const getIPAdress = () => {
+//     var interfaces = require('os').networkInterfaces()
+//     for (var devName in interfaces) {
+//         var iface = interfaces[devName]
+//         for (var i = 0; i < iface.length; i++) {
+//             var alias = iface[i]
+//             if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+//                 return alias.address
+//             }
+//         }
+//     }
+// }
 
 const port = process.env.port || process.env.npm_config_port || 5168
 
@@ -43,7 +43,7 @@ module.exports = {
     },
 
     devServer: {
-        host: getIPAdress(),
+        // host: getIPAdress(),
         port: port,
         open: true,
         overlay: {

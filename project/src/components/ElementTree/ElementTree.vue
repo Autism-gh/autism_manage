@@ -19,7 +19,7 @@
                 'customtree',
                 `customtree--${ treeSign }`,
                 `customtree--${ checkMode }`,
-                { 'customtree--line': treeLine }]"
+                treeLine ? 'customtree--line' : '']"
                 :indent="treeLine ? 0 : 22"
                 v-bind="treeAttrs"
                 :data="tree.dataObject"
