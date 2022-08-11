@@ -24,3 +24,24 @@
 }
 
 
+.el-table {
+    font-size: 13px;
+
+    th{
+        &.el-table__cell {
+            background-color: var(--background-color-base)!important;
+            font-weight: unset;
+            color: var(--color-text-regular);
+        }
+
+        &:last-child {
+            &.el-table__cell {
+                background-color: var(--color-white)!important;
+            }
+        }
+    }
+    .cell {
+        white-space: nowrap !important;
+    }
+}
+

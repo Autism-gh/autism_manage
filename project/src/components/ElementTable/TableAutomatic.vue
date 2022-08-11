@@ -32,12 +32,13 @@
                 height='100%'
                 style="width: 100%"
                 v-on="$listeners">
+                
                 <el-table-column
                     v-if="preColumns.includes('checkbox')"
                     type="selection"
                     width="55"
                     align="center"
-                    fixed>
+                    :fixed="fixedCheckbox">
                 </el-table-column>
 
                 <el-table-column
@@ -46,7 +47,7 @@
                     type="index"
                     width="50"
                     align="center"
-                    fixed>
+                    :fixed="fixedIndex">
                 </el-table-column>
 
                 <el-table-column 
@@ -153,7 +154,7 @@ export default {
 
         pinned: {
             type: Number,
-            default: 2,
+            default: 0,
         },
 
         /**
@@ -213,13 +214,27 @@ export default {
     name: 'TableAutomatic',
     data() {
         return {
-            showMore: false
+            showMore: false,
+
+            fixedCheckbox: false,
+
+            fixedIndex: false
         };
     },
     watch: {
-        formatFieldsConfig() {
-            this.reflash()
-        }
+        formatFieldsConfig: {
+            handler() {
+                this.reflash()
+            },
+            immediate: true
+        },
+
+        tableData: {
+            handler() {
+                this.reflash()
+            },
+            immediate: true
+        },
     },
     computed: {
         formatToal() {
@@ -251,16 +266,16 @@ export default {
             // 这些都是配好的
             if(this.checkedField?.length) {
                 return this.checkedField.map((item, index) => {
-                    return Object.assign(item, {
-                        fixed: index < (this.pinned - this.preColumns.length),
-                    })
+                    const fixed = index < (this.pinned - this.preColumns.length)
+                    return Object.assign(item, { fixed })
                 })
             } else {
                 // 没配好的可能还没格式化
                 return this.fieldConfig.map((item, index) => {
                     const { width, minWidth, align } = item
+                    const fixed = index < (this.pinned - this.preColumns.length)
                     return Object.assign(item, {
-                        fixed: index < (this.pinned - this.preColumns.length),
+                        fixed,
                         width: width,
                         minWidth: minWidth || 120,
                         align: align || 'center'
@@ -298,8 +313,17 @@ export default {
         },
 
 
-        reflash() {
+        async reflash() {
+            this.fixedIndex = this.pinned >= this.preColumns.length
+            await this.$nextTick()
+            this.fixedCheckbox = this.pinned >= this.preColumns.length
+            await this.$nextTick()
             this.$refs['automaticstable'].doLayout()
+
+            // const operateInstance = document.getElementsByClassName('el-table-slot-btn')[0]
+            // if(operateInstance) {
+            //     this.manageWidth = operateInstance?.offsetWidth + 50
+            // }
         },
 
         getCheckedRows() {

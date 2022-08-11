@@ -81,7 +81,7 @@
 
 <script>
     import ElementTree from '@/components/ElementTree/ElementTree'
-    import FlexContainer from '@/components/Layout/flexContainer2.vue'
+    import FlexContainer from '@/components/Layout/FlexContainer2'
     import TableManual from '@/components/ElementTable/TableManual'
     import { tableOptions, defaultData } from './components/fieldConfig'
     export default {

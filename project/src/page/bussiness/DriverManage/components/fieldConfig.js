@@ -55,6 +55,21 @@ export const tableOptions = [
         name: '驾驶员联系方式',
         field: 'phone',
         default: false,
+    },
+    {  
+        name: 'test3',
+        field: 'test3',
+        default: false,
+    },
+    {  
+        name: 'test2',
+        field: 'test2',
+        default: false,
+    },
+    {  
+        name: 'test1',
+        field: 'test1',
+        default: false,
     }
 ]
 
@@ -69,7 +84,10 @@ export const defaultData = [
         vin: 'SDA16D46AS4D56SA',
         industry: '民用',
         driver: '武闯',
-        phone: '18868483095'
+        phone: '18868483095',
+        test1: 'testest1test1test1test1test1test1test1t1',
+        test2: 'testest2test2test2test2test2test2test2t2',
+        test3: 'test3test3test3test3test3test3test3test3'
     },
     {
         platno: '浙A2B22P',

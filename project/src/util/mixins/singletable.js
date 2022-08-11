@@ -35,7 +35,7 @@ const mixin = {
 
             total: 0,
 
-            pinned: 4
+            pinned: 0
         }
     },
     watch: {

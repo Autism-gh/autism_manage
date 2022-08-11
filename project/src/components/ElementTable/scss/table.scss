@@ -4,6 +4,23 @@
     display: flex;
     flex-direction: column;
 
+    .el-table-slot-btn {
+        // display: flex;
+        // // justify-content: center;
+        width: max-content;
+        margin: auto;
+    }
+
+    /deep/.el-table__body-wrapper {
+        // z-index: 2;
+        border-bottom: solid 1px #eee;
+
+        &.is-scrolling-left~.el-table__fixed,
+        &.is-scrolling-right~.el-table__fixed-right {
+            box-shadow: 0 0 10px rgba(0,0,0, 0.12);
+        }
+    }
+
     .query-wrapper, .botton-wrapper, .table-wrapper, .page-wrapper {
         margin-top: var(--default-padding);
     }

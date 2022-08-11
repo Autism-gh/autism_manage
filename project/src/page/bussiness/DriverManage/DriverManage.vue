@@ -3,9 +3,11 @@
         <template slot="leftWrapper">
             <ElementTree treeSign="vehicleModel" default-expand-all></ElementTree>
         </template>
+        
         <template slot="rightTop">
             您好
         </template>
+
         <template slot="rightBottom">
             <TableAutomatic 
                 :fieldConfig="fieldConfig"
@@ -67,7 +69,7 @@
 
 <script>
     import ElementTree from '@/components/ElementTree/ElementTree'
-    import FlexContainer from '@/components/Layout/FlexContainer'
+    import FlexContainer from '@/components/Layout/FlexContainer2'
     import {TableAutomatic, SearchPanel} from '@/components/ElementTable'
     import PictureView from '@/components/PictureView/PictureView.vue'
 

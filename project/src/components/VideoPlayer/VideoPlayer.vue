@@ -1,12 +1,12 @@
 <template>
   <div class="video-container">
-    <div class="no-data" v-show="!haveUrl">监控画面</div>
-    <div class="video-center" v-show="haveUrl">
+    <div class="no-data" v-if="!playOptions">{{ title }}</div>
+    <div class="video-center" v-else>
       <video-player
           ref="videoPlayer"
-          :options="playerOptions"
-          v-on="$listeners"
-          @ready="playerReadied">
+          :playsinline="true"
+          :options="formatOptions"
+          v-on="$listeners">
       </video-player>
     </div>
   </div>
@@ -35,11 +35,29 @@ import 'video.js/dist/video-js.css'
 export default {
   name: 'VideoPlayer',
   components: { videoPlayer },
-  props: {  },
+  props: {  
+    title: {
+      type: String,
+      default: '监控页面'
+    },
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data () {
     return {
-      playerOptions: {
-          //播放速度
+      playOptions: null
+    }
+  },
+  computed: {
+    urlOptions() {
+      return this.playOptions || []
+    },
+
+    formatOptions() {
+      return Object.assign({
+        //播放速度
           playbackRates: [0.7, 1.0, 1.5, 2.0], 
           //如果true,浏览器准备好时开始回放。
           autoplay: false,
@@ -56,80 +74,70 @@ export default {
           // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
           fluid: true, 
 
-          sources: [],
-
+          sources: this.urlOptions,
           //你的封面地址
-          poster: "poster.jpg", 
+          // poster: "poster.jpg", 
 
           notSupportedMessage: '此视频暂无法播放，请稍后再试',
           
           controlBar: {
-            timeDivider: true,
+            timeDivider: true, 
             durationDisplay: true,
             remainingTimeDisplay: false,
             fullscreenToggle: true 
           }
-      },
-
-
-      videoInstance: null
-    }
-  },
-  computed: {
-    player() {
-      return this.$refs.videoPlayer.player
+      }, this.options)
     },
 
-    haveUrl() {
-        const { sources } = this.playerOptions
-        return sources && sources.length && sources.filter(item => item.url !== '').length
+    player() {
+      return this.$refs['videoPlayer']?.player
     }
   },
   methods: {
-      playerReadied(player) {
-        console.log('player', player)
-        // player.tech({ IWillNotUseThisInPlugins: true }).hls
-        // player.tech_.hls.xhr.beforeRequest = function(options) {
-        //   // console.log(options)
-        //   return options
-        // }
+      async changeVideo(options) {
+        this.reset()
+        const { type } = options
+        const format = Object.assign(options, {
+          type: type || 'video/mp4'
+        })
+        this.playOptions = [format]
+
+        await this.$nextTick()
+        this.play()
       },
 
-      init(options) {
-        Object.assign(this.playerOptions, options)
-        console.log('this.playerOptions', this.playerOptions.sources)
-      },
-
-      setProgress(url) {
-        this.player.src(url)
-      },
-      
       play() {
-        this.player.play()
+        this.player && this.player.play()
       },
 
-      stop() {
-        this.player.pause()
+      pause() {
+        this.player && this.player.pause()
+      },
+
+      close() {
+        this.stop()
+        this.reset()
+        this.playOptions = null
       },
 
       fullScreen() {
-        this.player.requestFullscreen()
+        this.player && this.player.requestFullscreen()
       },
 
       editScreen() {
-        this.player.exitFullscreen()
+        this.player && this.player.exitFullscreen()
       },
 
       reset() {
-        this.player.reset()
+        this.player && this.player.reset()
       },
 
       getSource() {
-        return this.player.currentSources()
+        return this.player ? this.player.currentSources() : null
       },
 
       showControl(type) {
-        this.player.controls(type)
+        this.player &&  this.player.controls(type)
       }
 
   },
@@ -150,6 +158,28 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.video-container {
+  .video-js {
+    height: 100%;
+    width: 100%;
+    &.vjs-fluid, &.vjs-16-9, &.vjs-4-3, &.vjs-9-16, &.vjs-1-1 {
+      &:not(.vjs-audio-only-mode) {
+        height: 100%;
+        padding: 0;
+      }
+    }
+
+    .vjs-big-play-button {
+      left: 50%;
+      top: 50%;
+      margin-left: -45px;
+      margin-top: -25px;
+    }
+  }
+}
+</style>
 <style lang="scss" scoped>
 .video-container {
   position: relative;
@@ -162,13 +192,21 @@ export default {
     height: 100%;
     top: 0;
     left: 0;
-    background: url('~@/assets/images/video/no-url.jpg') no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.1);
   }
 
   .video-center {
+    position: relative;
     width: 100%;
     height: 100%;
   }
 
+  .video-player {
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>

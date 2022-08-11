@@ -13,6 +13,14 @@ const assemblyRouter = {
     },
     children: [
         {
+            path: 'VideoCenter',
+            component: () => import('@/page/assembly/VideoCenter'),
+            name: 'VideoCenter',
+            meta: {
+                title: '视频中心'
+            }
+        },
+        {
             path: 'SubscribeData',
             component: () => import('@/page/assembly/SubscribeData'),
             name: 'SubscribeData',
