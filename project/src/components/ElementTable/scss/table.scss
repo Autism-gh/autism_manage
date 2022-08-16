@@ -3,8 +3,24 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    
+    .right-click-container {
+        position: fixed;
+        background-color: var(--color-white);
+        box-shadow: var(--box-shadow-base);
+        width: max-content;
+        z-index: 1000;
+        padding: 10px 0;
 
-    .el-table-slot-btn {
+        li {
+            padding: 0 20px;
+            line-height: 25px;
+            cursor: pointer;
+        }
+    }
+
+
+    .el-table-slot-btn, .el-table-slot-icon {
         // display: flex;
         // // justify-content: center;
         width: max-content;
@@ -20,8 +36,9 @@
             box-shadow: 0 0 10px rgba(0,0,0, 0.12);
         }
     }
-
+    
     .query-wrapper, .botton-wrapper, .table-wrapper, .page-wrapper {
+        position: relative;
         margin-top: var(--default-padding);
     }
 
@@ -97,40 +114,51 @@
 
     .table-wrapper {
         position: relative;
-        height: calc(100% - 300px);
-        flex-grow: 1;
-        flex-shrink: 1;
+        height: calc(100% - 150px);
+        flex: 1;
         padding: 0 var(--default-padding) 0 var(--default-padding);
 
-        .element-table-icon {
-            font-size: 18px;
-            margin: 5px;
-            color: var(--color-primary);
-            cursor: pointer;
-        }
-        
-        .table-lock-icon {
+        .el-table-custom-entry {
             position: absolute;
+            width: 100%;
+            height: calc(100% - 50px);
+            left: 0;
+            top: 40px;
+            z-index: 10;
             display: flex;
-            z-index: 100;
-            top: 6px;
-            right: 25px;
+            align-items: center;
+            justify-content: center;
+        }
 
-            i {
-                padding: 5px;
-                cursor: pointer;
-                font-size: 16px;
+        /deep/ .element-table-icon {
+            font-size: 18px;
+            margin: 0 5px;
+            cursor: pointer;
+            &:hover {
+                color: var(--color-primary);
+            }
+        }
+
+        /deep/ .element-table-text {
+            margin: 0 5px;
+            cursor: pointer;
+            &:hover {
+                color: var(--color-primary);
             }
         }
     }   
 
     .page-wrapper {
         position: relative;
-        display: flex;
         flex-shrink: 0;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 0 0 var(--default-padding);
+        padding: 0 var(--default-padding);
         margin-bottom: var(--default-padding);
+
+        .page-left {
+            float: left;
+        }
+        .page-right {
+            float: right;
+        }
     }
 }

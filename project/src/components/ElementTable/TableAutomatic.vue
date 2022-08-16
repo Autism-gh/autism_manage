@@ -1,5 +1,5 @@
 <template>
-    <div :class="['table-container', {'has-extand': $slots.extand}]">
+    <div :class="['table-container', $slots.extand ? 'has-extand' : '']">
         <div class="query-wrapper">
             <div class="first-floor">
                 <div class="filter-left" v-if="$slots.filterLeft">
@@ -20,74 +20,94 @@
             <slot name="button"></slot>
         </div>
         <div class="table-wrapper">
-            <div class="table-lock-icon">
-                <i class="el-icon-download"></i>
-                <i class="el-icon-setting" @click="handleOpenFieldDialog"></i>
-            </div>
+            <div v-show="!formatTableList.length" class="el-table-custom-entry">{{ emptyText }}</div>
 
             <el-table 
+                v-loading="tableLoading"
+                class="el-table__format"
+                :row-class-name="tableRowClassName"
                 ref="automaticstable"
-                :data="tableData" 
+                :data="formatTableList" 
                 border stripe highlight-current-row
                 height='100%'
                 style="width: 100%"
-                v-on="$listeners">
+                v-on="$listeners"
+                @row-contextmenu="handleRightClickEvent">
                 
                 <el-table-column
                     v-if="preColumns.includes('checkbox')"
                     type="selection"
-                    width="55"
                     align="center"
-                    :fixed="fixedCheckbox">
+                    :fixed="fixedCheckbox"
+                    width="55">
                 </el-table-column>
 
                 <el-table-column
                     v-if="preColumns.includes('index')"
                     label="序号"
                     type="index"
-                    width="50"
                     align="center"
-                    :fixed="fixedIndex">
+                    :fixed="fixedIndex"
+                    width="50">
                 </el-table-column>
 
                 <el-table-column 
                     v-for="(item, index) in formatFieldsConfig" 
                     :key="`${ item.field }-${ index }`" 
+                    show-overflow-tooltip
                     :label="item.name"
                     :width="item.width"
                     :min-width="item.minWidth"
                     :fixed="item.fixed"
                     :sortable="item.sortable"
-                    :align="item.align">
+                    :align="item.align"
+                    :prop="item.field">
                     
                     <template slot-scope="{ row }">
                         <template v-if="item.components">  
                             <slot :data="row" :name="`table-${item.components}`"></slot>
                         </template> 
-                        <template v-else-if="item.formatter">
-                            {{ item.formatter({ row, value: row[item.field] }) }}
-                        </template>
                         <template v-else>
-                            {{ row[item.field] }}
+                            {{ row[item.field] || '-' }}
                         </template>
                     </template>
 
                 </el-table-column>
 
-                <el-table-column fixed="right" label="操作" :width="manageColumn.length * 40" align="center">
+
+                <el-table-column v-if="$scopedSlots.tableoperate" v-show="manageWidth"
+                    fixed="right" label="操作" :width="scopedSlotsWidth" align="center">
                     <template slot-scope="{ row }">
-                        <i @click.stop="handleEmitEvent(item, row)" 
-                            class="element-table-icon" 
-                            v-for="item in manageColumn" 
-                            :key="item.event" :class="item.icon">
-                        </i>
+                        <div class="el-table-slot-btn">
+                            <slot name="tableoperate" :data="row"></slot>
+                        </div>
                     </template>
                 </el-table-column>
 
-                <el-table-column fixed="right" label="" width="70"></el-table-column>
+                <el-table-column v-if="manageColumn.length" v-show="manageWidth" 
+                    fixed="right" label="操作" :width="iconsSlotsWidth" align="center">
+                    <template slot-scope="{ row }">
+                        <div class="el-table-slot-icon">
+                            <span v-for="item in manageColumn" :key="item.event">
+                                <span v-show="item.usetext" @click.stop="handleEmitEvent(item, row)" class="element-table-text">{{ item.name }}</span>
+                                <IconBtn v-show="!item.usetext" @click.stop="handleEmitEvent(item, row)"  class="element-table-icon" :icon="item.icon" :title="item.name"></IconBtn>
+                            </span>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column v-if="fileIcon || exportIcon" fixed="right" width="70" align="center">
+                    <template slot="header" >
+                        <IconBtn v-if="exportIcon" icon="el-icon-download" @click="exportExcel" title=导出></IconBtn>
+                        <IconBtn v-if="fileIcon" icon="el-icon-setting" @click="handleOpenFieldDialog" title="设置"></IconBtn>
+                    </template>
+                </el-table-column>
+
             </el-table>
         </div>
-        <div class="page-wrapper">
+
+
+        <div class="page-wrapper" v-show="usePage">
             <div class="page-left" v-if="$slots.pageLeft">
                 <slot name="pageLeft"></slot>
             </div>
@@ -103,6 +123,13 @@
             </div>
         </div>
 
+        <ul class="right-click-container" ref="rightMenuRef" v-show="rightMenu.show">
+            <li v-for="item in rightMenu.list" 
+                :key="item.key" @click="handleContentEvent(item)">
+                {{ item.name }}
+            </li>
+        </ul>
+
         <FieldsSetting ref="FieldsSetting"></FieldsSetting>
 
         <slot></slot>
@@ -112,10 +139,15 @@
 <script>
 import { scrollTo } from '@/util/common/scroll-to'
 import FieldsSetting from './components/FieldsSetting.vue'
+import { listToObj } from '@/util/common/common'
+import exportXsl from './mixins/exportExl'
+import _ from 'lodash'
+
 export default {
     components: { 
         FieldsSetting,
     },
+    mixins: [exportXsl],
     props: {  
 
         /**
@@ -208,37 +240,70 @@ export default {
             default: function() {
                 return []
             }
+        },
+
+        exportIcon: {
+            type: [Boolean,String],
+            default: true
+        },
+
+        fileIcon: {
+            type: Boolean,
+            default: true
+        },
+
+        emptyText: {
+            type: String,
+            default: '暂无数据'
+        },
+
+        usePage: {
+            type: Boolean,
+            default: true
         }
 
     },
     name: 'TableAutomatic',
     data() {
         return {
+            tableLoading: false,
+
             showMore: false,
+
+            manageWidth: 0,
 
             fixedCheckbox: false,
 
-            fixedIndex: false
+            fixedIndex: false,
+
+            formatTableList: [],
+
+            scopedSlotsWidth: 100,
+
+            iconsSlotsWidth: 100,
+
+            rightMenu: {
+                show: false,
+
+                list: [
+                    { name: '复制本格', key: 'benge', copy: true },
+                    { name: '复制本格(含标题)', key: 'bengeTitle', copy: true },
+                    { name: '复制本行', key: 'benhang', copy: true },
+                    { name: '复制本行(含标题)', key: 'benhangTtle', copy: true },
+                    { name: '导出Excel', key: 'excel', copy: false },
+                    { name: '设置', key: 'setting', copy: false },
+                ],
+
+                activeData: {},
+
+                activeCell: ''
+            }
         };
     },
-    watch: {
-        formatFieldsConfig: {
-            handler() {
-                this.reflash()
-            },
-            immediate: true
-        },
-
-        tableData: {
-            handler() {
-                this.reflash()
-            },
-            immediate: true
-        },
-    },
+    
     computed: {
         formatToal() {
-            return this.total || this.tableData?.length || 0
+            return this.total || this.formatTableList?.length || 0
         },
 
         pageAttrs() {
@@ -262,29 +327,145 @@ export default {
             }
         },
 
+        pageStart() {
+            return (this.currentPage - 1) * this.currentPageSize
+        },  
+
+        fiedlRules() {
+            return listToObj(this.fieldConfig, 'field')
+        },
+
         formatFieldsConfig() {
             // 这些都是配好的
-            if(this.checkedField?.length) {
-                return this.checkedField.map((item, index) => {
-                    const fixed = index < (this.pinned - this.preColumns.length)
-                    return Object.assign(item, { fixed })
-                })
-            } else {
+            if(!this.gridTag || !this.checkedField?.length) {
                 // 没配好的可能还没格式化
                 return this.fieldConfig.map((item, index) => {
                     const { width, minWidth, align } = item
                     const fixed = index < (this.pinned - this.preColumns.length)
                     return Object.assign(item, {
-                        fixed,
+                        fixed: fixed,
                         width: width,
                         minWidth: minWidth || 120,
                         align: align || 'center'
                     })
                 })
+            } else {
+                const format = this.checkedField.filter(item => this.fiedlRules[item.field])
+                return format.map((item, index) => {
+                    const { field } = item
+                    const rule = this.fiedlRules[field]
+                    const fixed = index < (this.pinned - this.preColumns.length)
+                    return Object.assign(rule, { fixed: fixed })
+                })
             }
         }
     },
+
+    watch: {
+        formatFieldsConfig: {
+            handler() {
+                this.reflashField()
+            },
+            immediate: true
+        },
+
+        tableData: {
+            handler(newVal) {
+                this.handleDataChange(newVal)
+            },
+            immediate: true
+        },
+    },
+    
     methods: {
+        /**
+         * 右键
+         */
+
+        async handleRightClickEvent(row, columns, event) {
+            const { property, label } = columns
+            const menuDom = this.$refs['rightMenuRef']
+            event.preventDefault();
+            menuDom.style.left = event.clientX + "px";
+            menuDom.style.top = event.clientY + "px";
+            await this.$nextTick()
+            this.rightMenu.show = true
+            this.rightMenu.activeData = JSON.parse(JSON.stringify(row))
+            this.rightMenu.activeCell = { property, label }
+        },
+
+        handleContentEvent({ copy, key }) {
+            try {
+                if(copy) {
+                    const { activeData, activeCell: { property, label } } = this.rightMenu
+                    const rules = this.fiedlRules[property]
+                    let activeText
+
+                    if(rules.components) {
+                        activeText = '不可复制'
+                    } else {
+                        switch (key) {
+                            case 'benge':
+                                activeText = activeData[property]
+                                break;
+                            case 'bengeTitle':
+                                activeText = `${ label }: ${ activeData[property] }`
+                                break;
+                            case 'benhang':
+                                activeText = this.getRowFormatCopy(activeData)
+                                break;
+                            case 'benhangTtle':
+                                activeText = this.getRowFormatCopy(activeData, true)
+                                break;
+                        }
+                    }
+
+                    this.handleCopyClick(activeText)
+                } else {
+                    if(key === 'excle') {
+                        this.exportExcel()
+                    }
+                    if(key === 'setting') {
+                        this.handleOpenFieldDialog()
+                    }
+                }
+            } catch (error) {
+                console.log('error', error)
+            } finally {
+                this.rightMenu.show = false
+            }   
+        },
+
+        getRowFormatCopy(activeData, useTitle = false) {
+            const keysList = this.checkedField.map(item => item.field)
+
+            const list = []
+            keysList.forEach(item => {
+                const { name, components } = this.fiedlRules[item]
+                let ruleValue = components ? '该字段不可复制' : activeData[item]
+                if(useTitle) {
+                    ruleValue = `${ name }: ${ ruleValue }`
+                }
+                list.push(ruleValue)
+            })
+            return list.join(',')
+        },      
+
+        handleCopyClick(text) {
+            const inputInstance = document.createElement('input')
+            inputInstance.value = text;
+            document.body.appendChild(inputInstance)
+            inputInstance.select()
+            document.execCommand('copy')
+            document.body.removeChild(inputInstance)
+        },
+
+        tableRowClassName({ row, rowIndex }) {
+            row.el_table_index = rowIndex;
+        },
+
+
+
         handleOpenFieldDialog() {
             this.$refs['FieldsSetting'].handleOpenModal({
                 allData: this.fieldConfig,
@@ -313,18 +494,71 @@ export default {
         },
 
 
-        async reflash() {
-            this.fixedIndex = this.pinned >= this.preColumns.length
+
+
+        /**
+         * 
+         * 刷新数据
+         * 
+         */
+        handleDataChange: _.debounce(async function() {
+            this.tableLoading = true
+
+            const rulesList = this.fieldConfig.filter(item => item.formatter)
+
+            if(!rulesList.length) {
+                this.formatTableList = [...this.tableData]
+            } else {
+                const ruleObj = listToObj(rulesList, 'field')
+                const keyList = Object.keys(ruleObj)
+                const copyList = [...this.tableData]
+                copyList.forEach(item => {
+                    const obj = {}
+                    keyList.forEach(child => {
+                        const currentRule = ruleObj[child]
+                        const { field, formatter } = currentRule
+                        obj[field] = formatter({ row: item, value: item[field]  })
+                    })
+                    Object.assign(item, obj)
+                })
+                this.formatTableList = copyList
+            }
+
+
+            this.tableLoading = false
+
+            this.reflashTable()
+        }, 300),
+
+
+        async reflashTable() {
+            await this.$nextTick()
+            this.$refs['automaticstable']?.doLayout()
+        },
+
+
+        reflashField: _.debounce(async function() {
+            // 属实难受，fixed 走的循环，同一时间循环的东西太多导致第二个无法执行，所以等等
+            this.fixedIndex = this.pinned > 0
             await this.$nextTick()
             this.fixedCheckbox = this.pinned >= this.preColumns.length
-            await this.$nextTick()
-            this.$refs['automaticstable'].doLayout()
 
-            // const operateInstance = document.getElementsByClassName('el-table-slot-btn')[0]
-            // if(operateInstance) {
-            //     this.manageWidth = operateInstance?.offsetWidth + 50
-            // }
-        },
+            if(this.$scopedSlots.tableoperate) {
+                const operateInstance = document.getElementsByClassName('el-table-slot-btn')[0]
+                if(operateInstance) {
+                    this.scopedSlotsWidth = operateInstance?.offsetWidth + 50
+                }
+            }
+            
+            if(this.preColumns?.length) {
+                const iconInstance = document.getElementsByClassName('el-table-slot-icon')[0]
+                if(iconInstance) {
+                    this.iconsSlotsWidth = iconInstance?.offsetWidth + 50
+                }
+            }
+
+            this.reflashTable()
+        }, 100),
 
         getCheckedRows() {
             return this.$refs['automaticstable'].selection
@@ -345,6 +579,17 @@ export default {
     }
 };
 </script>
+<style lang="scss">
+.table-container {
+    .el-table__format {
+        margin-bottom: 10px;
+    }
+
+    .el-table__empty-block {
+        display: none;
+    }
+}
+</style>
 <style lang="scss" scoped>
 @import './scss/table.scss'
 </style>

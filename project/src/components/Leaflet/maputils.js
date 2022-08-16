@@ -13,3 +13,31 @@ export const leafletMapIcon = {
     'online': L.icon({ iconUrl: require('../../assets/images/map/online.png'), iconSize: [28, 28] }),
     'offline': L.icon({ iconUrl: require('../../assets/images/map/offline.png'), iconSize: [28, 28] })
 }
+
+
+export const translateDireDesc = (dire) => {
+    var text = ''
+    if(!dire && dire != 0) {
+        text = '-'
+        return text
+    } else if (dire == 0 || dire == 360) {
+        text = '正北'
+    } else if (dire > 0 && dire < 90) {
+        text = '东北'
+    } else if (dire == 90) {
+        text = '正东'
+    } else if (dire > 90 && dire < 180) {
+        text = '东南'
+    } else if (dire == 180) {
+        text = '正南'
+    } else if (dire > 180 && dire < 270) {
+        text = '西南'
+    } else if (dire == 270) {
+        text = '正西'
+    } else if (dire > 270 && dire < 360) {
+        text = '西北'
+    } else {
+        text = '正北'
+    }
+    return text
+}
