@@ -5,6 +5,7 @@
 </template>
 
 <script>
+const { AMap } = window
 export default {
     components: {  },
     props: {  
@@ -22,7 +23,14 @@ export default {
         
     },
     computed: {
-        
+        formatOptions() {
+            return {
+                center: [120.155855,30.328691],
+                zoom: 17,
+                // mapStyle: 'amap://styles/de973b14436206d6a3e3d8a9fd2698b9',
+                mapStyle: 'amap://styles/darkblue',
+            }
+        }
     },
     methods: {
         async createMap() {

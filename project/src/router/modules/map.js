@@ -11,7 +11,15 @@ const mapRouter = {
         title: '地图',
         icon: 'el-icon-map-location'
     },
-    children: [{
+    children: [
+        {
+            path: 'amap',
+            component: () => import('@/page/map/AmapDefault/AmapDefault'),
+            name: 'AmapDefault',
+            meta: {
+                title: '原生高德'
+            }
+        },{
             path: 'monitor',
             component: () => import('@/page/map/Monitor/Monitor'),
             name: 'Monitor',
