@@ -1,58 +1,73 @@
 <template>
-  <div class="leaflet-search-container">
+  <div class="leaflet-search-container" v-click-outside="handleCloseMenu">
       <div class="address bg"  @click="search.show = !search.show">
         <span>{{ search.value.name }}</span>
         <i :class="[search.show? ' el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
       </div>
-      <div class="address-content bg" v-show="search.show">
-        <div class="address-row">
-            <div class="title">常用城市</div>
-            <div class="content">
-                <span class="city" v-for="item in search.common" :key="item.city_code" @click="handleChangeHot(item)">
-                  {{ item.chinese_name }}
-                </span>
-            </div>
+      <el-collapse-transition>
+        <div class="address-content bg" v-show="search.show">
+          <div class="address-row">
+              <div class="title">常用城市</div>
+              <div class="content">
+                  <span class="city" v-for="item in search.common" :key="item.city_code" @click="handleChangeHot(item)">
+                    {{ item.chinese_name }}
+                  </span>
+              </div>
+          </div>
+          <div class="address-row">
+              <div class="title">选择城市</div>
+              <div class="content">
+                <el-cascader
+                  @visible-change="hanleRememberState"
+                  @change="handleChangeCenter"
+                  style="width: 100%"
+                  placeholder="试试搜索：杭州"
+                  :props="{ expandTrigger: 'hover' }"
+                  :options="search.list"
+                  v-model="search.active"
+                  filterable>
+                </el-cascader>
+              </div>
+          </div>
         </div>
-        <div class="address-row">
-            <div class="title">选择城市</div>
-            <div class="content">
-              <el-cascader
-                @change="handleChangeCenter"
-                style="width: 100%"
-                placeholder="试试搜索：指南"
-                :options="search.list"
-                v-model="search.active"
-                filterable>
-              </el-cascader>
-            </div>
-        </div>
-      </div>
+      </el-collapse-transition>
 
       <div class="search">
-          <el-select
-            v-model="address.value"
-            multiple filterable remote
-            reserve-keyword placeholder="请输入关键词"
-            :remote-method="remoteMethod"
-            :loading="address.loading">
-            <el-option
-              v-for="item in address.list"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-input 
+            v-model="address.value" 
+            :style="`width: ${ address.width }`"  
+            placeholder="请输入关键字"
+            @focus="address.width = '250px'"
+            @blur="address.width = '110px'"
+            clearable>
+          </el-input>
           <el-button type="primary" icon="el-icon-search"></el-button>
+
+          <el-collapse-transition>
+            <div class="search-content bg" v-show="address.value">
+              <ul class="no-data" v-if="!address.list.length">未查询到数据</ul>
+              <ul v-else>
+                <li v-for="item in address.list" :key="item.id" @click.stop="changeViewCenter(item)">
+                  <div class="name">{{ item.name }}</div>
+                  <el-tag type="success">{{ item.city }}</el-tag>
+                </li>
+              </ul>
+            </div>
+          </el-collapse-transition>
       </div>
   </div>
 </template>
 <script>
 import L from '../leaflet'
-import { regionData } from "element-china-area-data"
+import { 
+  provinceAndCityData, 
+  // regionData 
+} from "element-china-area-data"
 import { hotCityList } from '../util/hotcity'
-const GaodeCityInfo = require('@/util/map/mapGaodeCityInfo.json')
+import { getPoiByAddressOrderGaode, getCurrentRangeCenter } from '@/util/map/mapGaodeWebApi'
+// const GaodeCityInfo = require('@/util/map/mapGaodeCityInfo.json')
 export default {
-  name: '',
+  name: 'MapSearch',
   components: {  },
   props: {  
     area: {
@@ -63,17 +78,19 @@ export default {
   data () {
     return {
       search: {
+        povershow: false,
+
         active: [],
         value: {},
-        list: regionData,
+        list: provinceAndCityData,
         common: hotCityList,
         show: false,
       },
 
       address: {
-        loading: false,
         list: [],
-        value: ''
+        value: '',
+        width: '110px'
       },
 
       mapInstance: null,
@@ -85,37 +102,64 @@ export default {
 
   },
   watch: {
+    'address.value': function(newVal) {
+      this.getSearchLoactionList(newVal) 
+    },
+
     'area': function(newVal) {
       if(!newVal || Array.isArray(newVal)) return
       this.search.value = { name: newVal }
     }
   },
   methods: {
+    hanleRememberState(state) {
+      this.search.povershow = state
+    },
+    
+    handleCloseMenu() {
+      if(this.search.povershow) return
+      this.search.show = false
+    },
+
     init(map) {
       this.mapInstance = map
       this.featureGroup = new L.FeatureGroup().addTo(this.mapInstance)
+    },
 
-      
+    changeViewCenter({ latlng }) {
+      this.setCurrentView([latlng[1], latlng[0]], 16)
     },
 
 
-    remoteMethod(query) {
+    getSearchLoactionList(query) {
       if (query !== '') {
-        this.address.loading = true;
-        setTimeout(() => {
-          console.log('query', query)
-          this.address.loading = false;
-          this.address.options = []
+        setTimeout( async () => {
+          const result = await getPoiByAddressOrderGaode({ keywords: query })
+          this.address.list =  Array.isArray(result) ? result : []
         }, 200);
       } else {
-        this.address.options = [];
+        this.address.list = [];
       }
     },
 
-    handleChangeCenter(data) {
-      const code = data[data.length - 1]
-      const acdtive = GaodeCityInfo.find(item => item.city_code === code)
-      this.handleChangeHot(acdtive)
+    async handleChangeCenter(data) {
+      const querycode = data[data.length - 1]
+      const result = await getCurrentRangeCenter({ keywords: querycode })
+
+      if(!result) {
+        this.$warning('获取中心位置失败')
+        return
+      }
+
+      const { adcode, center, citycode, name } = result
+
+      const lnglat = center.split(',')
+      this.handleChangeHot({
+        chinese_name: name,
+        city_code: adcode,
+        large_code: citycode,
+        center: lnglat
+      })
     },
 
     handleChangeHot(item) {
@@ -125,14 +169,15 @@ export default {
         code: city_code,
         center: center
       }
-
-      if(center) {
+      // console.log('center', center)
+      if(center && center.length) {
         this.setCurrentView(center)
-      }
+      }  
     },
 
-    setCurrentView(latlng, zoom = 16) {
-      this.mapInstance.setView(L.latLng(latlng), zoom)
+    setCurrentView(latlng, zoom = 10) {
+      const fromat = [latlng[1], latlng[0]]
+      this.mapInstance && this.mapInstance.setView(L.latLng(fromat), zoom)
     },
 
     cleanLayer() {
@@ -141,8 +186,7 @@ export default {
         this.featureGroup.remove()
         this.featureGroup = null
       }
-    }
-
+    },
   },
   beforeCreate () {
 
@@ -154,7 +198,7 @@ export default {
 
   },
   mounted () {
-
+    this.search.value = { name: this.area }
   },
   beforeDestroy() {
     this.cleanLayer()
@@ -231,9 +275,6 @@ export default {
       .title {
         line-height: 30px;
       }
-      .content {
-
-      }
     }
   }
 
@@ -244,6 +285,41 @@ export default {
     height: max-content;
     width: max-content;
     margin-left: var(--default-padding);
+
+
+    .search-content {
+      position: absolute;
+      top: 35px;
+      left: 0;
+      width: 100%;
+      padding: 10px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 250px;
+
+      .no-data {
+        text-align: center;
+      }
+
+      li {
+        padding: 5px 17px;
+        display: flex;
+        align-items: center;
+
+        .name {
+          width: calc(100% - 50px);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: var(--color-primary);
+          color: #FFFFFF;
+        }
+      }
+    }
   }
 }
 </style>

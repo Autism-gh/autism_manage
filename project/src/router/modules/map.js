@@ -13,6 +13,14 @@ const mapRouter = {
     },
     children: [
         {
+            path: 'pointGenerate',
+            component: () => import('@/page/map/PointGenerate/PointGenerate'),
+            name: 'PointGenerate',
+            meta: {
+                title: '绘点测试'
+            }
+        },
+        {
             path: 'amap',
             component: () => import('@/page/map/AmapDefault/AmapDefault'),
             name: 'AmapDefault',

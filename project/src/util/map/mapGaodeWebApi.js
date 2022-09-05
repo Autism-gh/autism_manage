@@ -79,6 +79,35 @@ export const getUserAddressByIP = (ip) => {
 
 
 
+export const getPoiByAddressOrderGaode = ({ keywords, city, offset = 10 }) => {
+    return new Promise((resolve, reject) => {
+        let v3path = `https://restapi.amap.com/v3/place/text?keywords=${ keywords }&city=${ city }&output=json&offset=${ offset }&page=1&key=${ gaodekeyLLQ }&extensions=base`
+    
+        axios.get(v3path).then(res => {
+            const { status, info } = res?.data || {}
+            if(!status || status != '1') {
+                resolve(info)
+                return
+            }
+            const format = res.data.pois.map(item => {
+                const { location, address, cityname, name } = item
+                const lnglat = location.split(',')
+                return {
+                    id: Math.floor(Math.random() * 10000),
+                    name,
+                    address,
+                    city: cityname,
+                    latlng: [lnglat[1], lnglat[0]]
+                }
+            })
+            resolve(format)
+        }).catch(e => {
+            reject(new Error(e))
+        })
+    })
+}
+
+
 export const getAddressByLnglat = ({ lng, lat, radius = 1000 }, format = true) => {
     return new Promise((resolve, reject) => {
         let v3path = `https://restapi.amap.com/v3/geocode/regeo?output=json&location=${lng},${lat}&key=${ gaodekeyLLQ }&radius=${ radius }&extensions=all`
@@ -103,26 +132,18 @@ export const getAddressByLnglat = ({ lng, lat, radius = 1000 }, format = true) =
 }
 
 
-export const getCityCenter = (citycode, cityName) => {
+
+export const getCurrentRangeCenter = ({ keywords, subdistrict = 1 } = {}) => {
     return new Promise((resolve, reject) => {
-        let v3path = `https://restapi.amap.com/v3/geocode/geo?city=${citycode}&address=${ cityName }公安局&output=json&key=${ gaodekeyLLQ }`
-
+        let v3path = `https://restapi.amap.com/v3/config/district?keywords=${ keywords }&subdistrict=${ subdistrict }&key=${ gaodekeyLLQ }`
+    
         axios.get(v3path).then(res => {
-
-            const { status } = res
-            if(!status || status !=  200 ||  !res?.data) return
-            const { status: apistate } = res.data
-            if(apistate !== '1') return
-
-            const { geocodes } = res?.data
-            
-            if(geocodes && geocodes.length) {
-                const {location} = geocodes?.[0]
-                const latlng = location.split(',')
-                resolve([latlng[0], latlng[1]])
-            } else {
-                resolve([])
+            const { status, info } = res?.data || {}
+            if(!status || status != '1') {
+                resolve(info)
+                return
             }
+            resolve(res?.data?.districts?.[0])
         }).catch(e => {
             reject(new Error(e))
         })

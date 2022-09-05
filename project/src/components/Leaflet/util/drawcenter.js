@@ -1,5 +1,7 @@
 import L from '@/components/Leaflet/leaflet'
 
+import { leafletMapIcon } from '@/components/Leaflet/maputils'
+
 /**
  * 
  * 一个画图的处理器
@@ -34,7 +36,8 @@ class DrawTool {
         // 存储可编辑图层
         this.featureGroup = new L.FeatureGroup()
         this.mapInstance.addLayer(this.featureGroup)
-
+        
+        this.addfeatureGroup()
 
         this.drawControl = {
             Circle : new L.Draw.Circle(this.mapInstance, {shapeOptions: { weight:3, fillOpacity:0.35 }}),
@@ -45,7 +48,7 @@ class DrawTool {
 
             Polyline: new L.Draw.Polyline(this.mapInstance, {showLength:true, allowIntersection:false,shapeOptions:{weight:4,fillOpacity:0.35}}),
 
-            Marker: new L.Draw.Marker(this.mapInstance, {shapeOptions: {weight:3,fillOpacity:0.35}}),
+            Marker: new L.Draw.Marker(this.mapInstance, {icon: leafletMapIcon['default'],  shapeOptions: {weight:3,fillOpacity:0.35}}),
 
             Measure: new L.Polyline.Measure(this.mapInstance),
 
@@ -63,8 +66,17 @@ class DrawTool {
                     this.callBack(event)
                 } else {
                     this.featureGroup.addLayer(layer)
+                    this.edit()
                 }
             })
+        }
+    }
+
+    addfeatureGroup() {
+        if(!this.featureGroup) {
+            // 存储可编辑图层
+            this.featureGroup = new L.FeatureGroup()
+            this.mapInstance.addLayer(this.featureGroup)
         }
     }
 
@@ -81,7 +93,7 @@ class DrawTool {
             this.isDrawed = true
             this.featureGroup.addLayer(layer)
             const bounds = this.featureGroup.getBounds()
-            this.mapInstance.fitBounds(bounds)
+            this.mapInstance && this.mapInstance.fitBounds(bounds)
         }
     }
 
@@ -107,6 +119,20 @@ class DrawTool {
             if(options) this.activeDrawer.setOptions(options)
             this.activeDrawer.enable()
         }
+    }
+
+    reDraw() {
+        this.stopDraw()
+        this.stopEdit()
+        this.clear()
+        this.draw(this.type)
+    }
+
+    // 都停下来仅次于销毁了
+    clearAll() {
+        this.stopDraw()
+        this.stopEdit()
+        this.clear()
     }
 
     stopDraw() {
@@ -140,6 +166,8 @@ class DrawTool {
     getParmas() {
         if(!this.featureGroup) return
         const currentLayer = this.featureGroup.getLayers()[0]
+
+        if(!currentLayer) return
         let parmas = null
         if(this.type === 'Circle') {
             parmas = {
@@ -163,7 +191,7 @@ class DrawTool {
         return parmas
     }
 
-    destroyed() {
+    destroy() {
         this.stopDraw()
         this.stopEdit()
         if(this.featureGroup) {

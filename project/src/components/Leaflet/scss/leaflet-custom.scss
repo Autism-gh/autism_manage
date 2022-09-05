@@ -51,6 +51,7 @@
 
 .leaflet-container {
   .address_popup {
+    padding: var(--default-padding);
     li {
       line-height: 24px;
 

@@ -11,6 +11,10 @@ import {
     timmeMap
 } from './maputils'
 
+import _ from 'lodash'
+
+import { isString } from '@/util/common/type-check'
+
 export default {
     data() {
         return {
@@ -24,6 +28,8 @@ export default {
 
             trafficLayer: null,
 
+            addressPopup: null,
+
             address: {
                 popup: null,
                 marker: null,
@@ -32,6 +38,8 @@ export default {
 
             control: {
                 searchSwitch: true,
+                bottomSwitch: false,
+
                 show: true,
                 list: [{
                         name: '地址搜索',
@@ -60,11 +68,29 @@ export default {
                 map: []
             },
 
+            view: {
+                value: '',
+                list: []
+            },
+
             bottomaddress: {
                 format: '',
                 active: '',
                 detail: {}
             },
+        }
+    },
+
+    computed: {
+        closeSingle() {
+            const { searchSwitch, bottomSwitch } = this.control
+            return !searchSwitch && !bottomSwitch
+        }  
+    },
+
+    watch: {
+        closeSingle(newVal) {
+            this.startListerCenter(newVal)
         }
     },
 
@@ -122,49 +148,9 @@ export default {
          * 中心经纬度开关控制器 ------------------
          */
         startCenterLatlng(state) {
-            if (state) {
-                this.changeCenterAddress()
-                this.mapInstance.on('zoomend', this.changeCenterAddress)
-                this.mapInstance.on('moveend', this.changeCenterAddress)
-            } else {
-                this.bottomaddress = { format: '', active: '' }
-                this.mapInstance.off('zoomend', this.changeCenterAddress)
-                this.mapInstance.off('moveend', this.changeCenterAddress)
-            }
+            this.control.bottomSwitch = state
         },
-        async changeCenterAddress() {
-            const zoom = this.mapInstance.getZoom()
-            const center = this.mapInstance.getCenter()
-            const {
-                lat,
-                lng
-            } = center
-            const address = await getAddressByLnglat({
-                lng,
-                lat
-            })
-            const {
-                formatted_address,
-                addressComponent: {
-                    country,
-                    province,
-                    city,
-                    district,
-                    township
-                }
-            } = address
-            let result
-            if (zoom < 5) {
-                result = country
-            } else if (zoom >= 5 && zoom < 10) {
-                result = `${ province }-${ city }`
-            } else if (zoom >= 10 && zoom < 14) {
-                result = `${ province }-${ city }-${ district }-${ township }`
-            } else if (zoom >= 14) {
-                result = formatted_address
-            }
-            this.bottomaddress = {result, active: district || township}
-        },
+        
 
 
         /**
@@ -180,6 +166,7 @@ export default {
 
         clearPopupMarker() {
             if (this.address.marker) this.mapInstance.removeLayer(this.address.marker)
+            this.mapInstance.off("popupclose")
         },
 
         async handleDrawCallBack(event) {
@@ -206,7 +193,14 @@ export default {
                 address: formatted_address
             }
             await this.$nextTick()
-            this.drawToolInstane.destroyed()
+
+            this.mapInstance.on("popupclose", (e) => {
+                if(e.popup == this.address.popup) {
+                    this.clearPopupMarker()
+                }
+            })
+
+            this.drawToolInstane.destroy()
         },
 
 
@@ -221,15 +215,6 @@ export default {
             } else {
                 this.polylineMeasure.enable()
             }
-        },
-
-
-
-        /**
-         * 视野添加开关 -----------------------------------
-         */
-        addNewView() {
-
         },
 
 
@@ -252,6 +237,10 @@ export default {
         },
 
 
+        /**
+         * 鹰眼地图 -----------------------------------------
+         * @param {*} type 
+         */
         changeMiniMapLayer(type) {
             if (type) {
                 if (!this.minimapLayer) {
@@ -285,7 +274,10 @@ export default {
         },
 
 
-
+        /**
+         * 路况 --------------------------------------------
+         * @param {} type 
+         */
         changeTrafficLayer(type) {
             if (type) {
                 if (!this.trafficLayer) {
@@ -299,8 +291,80 @@ export default {
             } else {
                 this.trafficLayer && this.trafficLayer.remove()
             }
-        }
+        },
 
+
+        changeCurrentView(item) {
+            if(!item) return
+            const { zoom, center } = item
+            this.mapInstance && this.mapInstance.setView([center[1], center[0]], zoom)
+        },
+
+
+        /**
+         * 开始监听中心点地址
+         */
+        startListerCenter(state) {
+            if(!this.mapInstance) return
+            if (state) {
+                this.bottomaddress = { format: '', active: '' }
+                this.mapInstance.off('zoomend', this.changeCenterAddress)
+                this.mapInstance.off('moveend', this.changeCenterAddress)
+            } else {
+                this.changeCenterAddress()
+                this.mapInstance.on('zoomend', this.changeCenterAddress)
+                this.mapInstance.on('moveend', this.changeCenterAddress)
+            }
+        },
+        
+        checkAddress(value) {
+            return value && isString(value)
+        },
+
+        changeCenterAddress: _.debounce(async function() {
+            if(!this.mapInstance) return
+            const zoom = this.mapInstance?.getZoom()
+            const center = this.mapInstance?.getCenter()
+            const {
+                lat,
+                lng
+            } = center
+            const address = await getAddressByLnglat({
+                lng,
+                lat
+            })
+            const {
+                formatted_address,
+                addressComponent: {
+                    country,
+                    province,
+                    city,
+                    district,
+                    township
+                }
+            } = address
+            let format = []
+
+            if (zoom < 5) {
+                this.checkAddress(country) && format.push(country)
+            } else if (zoom >= 5 && zoom < 10) {
+                this.checkAddress(province) && format.push(province)
+                this.checkAddress(city) && format.push(city)
+            } else if (zoom >= 10 && zoom < 14) {
+                this.checkAddress(province) && format.push(province)
+                this.checkAddress(city) && format.push(city)
+                this.checkAddress(district) && format.push(district)
+                this.checkAddress(township) && format.push(township)
+            } else if (zoom >= 14) {
+                this.checkAddress(formatted_address) && format.push(formatted_address)
+            }
+
+            this.bottomaddress = {format: format.join('-'), active: city || township}
+        }, 500)
 
     },
+
+    mounted () {
+
+    }
 }

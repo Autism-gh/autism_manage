@@ -5,7 +5,7 @@
     <!-- 右上角控制器 -->
     <div class="leaflet-control-container">
       <div class="left_top_control bg" v-show="control.show">
-        <div class="row" @click="addNewView"><IconBtn icon="el-icon-aim" title="我的视野"></IconBtn></div>
+        <div class="row" ><IconBtn icon="el-icon-aim" title="我的视野"></IconBtn></div>
         <div class="row" @click="startMeasureControl"><IconBtn icon="el-icon-sugar" title="距离测量"></IconBtn></div>
         <div class="row" @click="startDrawControl"><IconBtn icon="el-icon-map-location" title="采集位置"></IconBtn></div>
         <div class="row">
@@ -42,7 +42,7 @@
         </div>
     </MapPopup>
 
-    <div class="leaflet-bottom-address" v-show="bottomaddress"><span>{{ bottomaddress.format }}</span></div>
+    <div class="leaflet-bottom-address" v-show="control.bottomSwitch"><span>{{ bottomaddress.format }}</span></div>
 
     <slot></slot>
   </div>
@@ -130,6 +130,8 @@ export default {
       // 坐标采集的框框
       this.address.popup = this.$refs['addressCollect'].init(this.mapInstance)
 
+      this.startListerCenter(this.closeSingle)
+
       if(this.control.selectList) {
         this.control.selectList.forEach(item => {
           this.changeCurrentControl(item, true)
@@ -171,7 +173,7 @@ export default {
       this.observerInstance.unobserve(this.$refs['leafletref'])
       this.observerInstance = null
     }
-    this.drawToolInstane.destroyed()
+    this.drawToolInstane.destroy()
     this.distoryMap()
   },
 

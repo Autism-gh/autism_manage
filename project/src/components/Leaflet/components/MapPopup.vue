@@ -1,6 +1,6 @@
 <template>
     <div class="popup-wrapper">
-        <div class="popup-close" @click="close">
+        <div class="popup-close" @click="close" v-show="customClose">
             <i class="el-icon-close"></i>
         </div>
         <slot></slot>
@@ -10,7 +10,7 @@
 <script>
 import L from 'leaflet'
 export default {
-    name: 'Popup',
+    name: 'MapPopup',
     data () {
         return {
             visible: false,
@@ -55,6 +55,10 @@ export default {
             type: Boolean,
             default: false
         },
+        customClose: {
+            type: Boolean,
+            default: true
+        },
         closeButton: {
             type: Boolean,
             default: false
@@ -89,7 +93,7 @@ export default {
             if(marker instanceof L.Marker) {
                 this.visible = true
                 this.removeListener()
-                marker.on('remove',this.close)
+                marker.on('disappear',this.close)
 
                 if(this.closeOnMove) {
                     marker.on('move',this.positionChangedListener)
@@ -104,7 +108,7 @@ export default {
         },
         removeListener() {
             if (this.currentMarker) {
-                this.currentMarker.off('remove',this.close)
+                this.currentMarker.off('disappear',this.close)
                 this.currentMarker.off('move',this.positionChangedListener)
                 this.currentMarker = null
             }
@@ -127,7 +131,6 @@ export default {
 <style lang="scss" scoped>
 .popup-wrapper {
     position: relative;
-    padding: 10px 15px;
 
     .popup-close {
         position: absolute;
