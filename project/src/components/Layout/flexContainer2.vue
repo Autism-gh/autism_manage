@@ -8,7 +8,15 @@
             v-if="checkLeftWrapper" 
             v-show="!vertical.leftmost"
             :style="leftWrapperStyle">
-            <slot name="leftWrapper"></slot>
+
+            <div class="disable-task" v-show="leftDis"></div>
+
+            <div class="left-top">
+                <slot name="leftWrapper"></slot>
+            </div>
+            <div class="left-bottom" v-show="$slots.leftBottom">
+                <slot name="leftBottom"></slot>
+            </div>
         </div>
 
         <div class="right-wrapper" :style="rightWrapperStyle">
@@ -16,11 +24,15 @@
                 v-if="checkLTopWrapper"
                 v-show="horizontal.topmost !== 'top'" 
                 :style="topWrapperStyle">
-                <slot name="rightTop"></slot>
+                <div class="disable-task" v-show="rightTopDis"></div>
+                <div class="wapper-content">
+                    <slot name="rightTop"></slot>
+                </div>
             </div>
             <div class="right-wrapper__bottom"
                 v-show="horizontal.topmost !== 'bottom'"
                 :style="bottomWrapperStyle">
+                <div class="disable-task" v-show="rightBottomDis"></div>
                 <slot name="rightBottom"></slot>
             </div>
         </div>
@@ -82,7 +94,7 @@ export default {
     name: 'flexContainer2',
     components: {  },
     props: {  
-        leftWidth: {
+        leftSize: {
             type: Number,
             default: 320
         },
@@ -105,7 +117,7 @@ export default {
             default: 240
         },
 
-        topHeight: {
+        topSize: {
             type: Number,
             default: 120
         },
@@ -135,13 +147,37 @@ export default {
         hasShadow: {
             type: Boolean,
             default: false
+        },
+
+        leftDis: {
+            type: Boolean,
+            default: false
+        },
+
+        rightTopDis: {
+            type: Boolean,
+            default: false
+        },
+
+        rightBottomDis: {
+            type: Boolean,
+            default: false
+        },
+
+        initPadding: {
+            type: Number,
+            default: 10
+        },
+
+        // 是否伴随移动
+        moveFollow: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
         return {
-            initPadding: 10,
-
-            isDraging: true,
+            isDraging: false,
 
             vertical: {
                 barShow: false,
@@ -175,6 +211,17 @@ export default {
     },
 
     computed: {
+        checkLeftWrapper() {
+            return this.$slots.leftWrapper
+        },
+        
+        checkLTopWrapper() {
+            return this.$slots.rightTop
+        },
+
+        /**
+         * 标量
+         */
         maxLeftNumber() {
             const { width } = this.flexContainer
             return this.maxLeft > 1 ? this.maxLeft : Math.floor(width * this.maxLeft) 
@@ -185,7 +232,7 @@ export default {
         },
         leftNumber() {
             const { width } = this.flexContainer
-            return this.leftWidth > 1 ? this.leftWidth : Math.floor(width * this.leftWidth)
+            return this.leftSize > 1 ? this.leftSize : Math.floor(width * this.leftSize)
         },
 
         maxTopNumber() {
@@ -198,21 +245,22 @@ export default {
         },
         topNumber() {
             const { height } = this.flexContainer
-            return this.topHeight > 1 ? this.topHeight : Math.floor(height * this.topHeight)
+            return this.topSize > 1 ? this.topSize : Math.floor(height * this.topSize)
         },
 
-        checkLeftWrapper() {
-            return this.$slots.leftWrapper
-        },
         
-        checkLTopWrapper() {
-            return this.$slots.rightTop
-        },
-
-        formatLeftWidth() {
+        formatleftSize() {
             if(!this.checkLeftWrapper) return 0
             const { left  } = this.vertical
-            const formatLeft = left || this.leftNumber || this.minLeftNumber
+
+            let baseValue = this.leftNumber || this.minLeftNumber
+            let formatLeft
+
+            if(this.moveFollow) {
+                formatLeft = this.leftBarX || baseValue
+            } else {
+                formatLeft = left || baseValue
+            }
             return formatLeft
         },
 
@@ -221,7 +269,7 @@ export default {
             if(leftmost) {
                 return `width: 0px;`
             } else {
-                return `width: ${ this.formatLeftWidth }px`
+                return `width: ${ this.formatleftSize }px`
             }
         },
 
@@ -230,7 +278,7 @@ export default {
             if(leftmost) {
                 return 'width: 100%;'
             } else {
-                return `width: calc(100% - ${ this.formatLeftWidth }px)`
+                return `width: calc(100% - ${ this.formatleftSize }px)`
             }
             
         },
@@ -241,12 +289,16 @@ export default {
             if(leftmost) {
                 return `left: 0px;`
             } else {
-                return `left: ${this.formatLeftWidth + this.initPadding}px;`
+                return `left: ${this.formatleftSize + this.initPadding}px;`
             }
         },
         
         leftBarStyle() {
-            return `left: ${ this.leftBarX }px`
+            if(this.moveFollow) {
+                return `left: ${ this.leftBarX + this.initPadding }px`
+            } else {
+                return `left: ${ this.leftBarX }px`
+            }
         },
 
         leftBarX() {
@@ -267,7 +319,7 @@ export default {
         },
 
 
-        formatTopHeight() {
+        formattopSize() {
             if(!this.checkLTopWrapper) return 0
             const { top } = this.horizontal
             let formatTop = top || this.topNumber || this.minTopNumber
@@ -282,32 +334,36 @@ export default {
             } else if(topmost === 'bottom') {
                 return `height: 100%`
             } else {
-                return `height: ${this.formatTopHeight}px;`
+                return `height: ${this.formattopSize}px;`
             }
         },
 
         bottomWrapperStyle() {
+            if(!this.checkLTopWrapper) return 'height: 100%'
+
             const { topmost } = this.horizontal
             if(topmost === 'top') {
                 return `height: 100%;`
             } else if(topmost === 'bottom') {
                 return `height: 0;`
             } else {
-                return `height: calc(100% - ${this.formatTopHeight}px);`
+                return `height: calc(100% - ${this.formattopSize}px - ${ this.initPadding }px);`
             }
         },
 
         formatHandleStyle() {
-            if(isString(this.formatTopHeight)) {
-                return this.formatTopHeight
+            if(isString(this.formattopSize)) {
+                return this.formattopSize
             } else {
-                return `${ this.formatTopHeight + this.initPadding }px`
+                return `${ this.formattopSize + this.initPadding }px`
             }
         },
 
         topHandleStyle() {
             const { topmost } = this.horizontal
-            const width = `width: calc( 100% - ${this.formatLeftWidth }px - ${ this.initPadding }px);`
+            const { leftmost } = this.vertical
+
+            const width = leftmost ? 'width: 100%' : `width: calc( 100% - ${this.formatleftSize }px - ${ this.initPadding }px);`
             if(topmost === 'top') {
                 return `${ width } top: 0px;`
             } else if(topmost === 'bottom') {
@@ -318,7 +374,7 @@ export default {
         },
 
         topBarStyle() {
-            return `width: calc( 100% - ${this.formatLeftWidth }px - ${ this.initPadding }px); top: ${ this.topBarY }px;`
+            return `width: calc( 100% - ${this.formatleftSize }px - ${ this.initPadding }px); top: ${ this.topBarY }px;`
         },
 
 
@@ -372,7 +428,11 @@ export default {
             const { canDrag, leftmost } = this.vertical
             if(!canDrag || leftmost) return
             this.isDraging = true
-            this.vertical.mouseX = e.clientX
+
+            if(!this.moveFollow) {
+                this.vertical.mouseX = e.clientX 
+            }
+
             this.getFlexContanerRect()
             this.vertical.barShow = true
             window.addEventListener('mousemove', this.leftMove)
@@ -460,7 +520,26 @@ export default {
     width: 100%;
     height: 100%;
     display: flex;
+    user-select: auto;
     padding: var(--default-padding);
+
+
+    .disable-task {
+        z-index: 10;
+        background: transparent;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    .wapper-content {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
 
     .left-wrapper {
         position: relative;
@@ -468,14 +547,27 @@ export default {
         border-radius: 4px;
         background-color: var(--color-white);
         margin-right: var(--default-padding);
+        display: flex;
+        flex-direction: column;
+
+        .left-top {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            height: calc(100% - 300px);
+        }
+
+        .left-bottom {
+            position: relative;
+            width: 100%;
+        }
     }
 
     .right-wrapper {
         position: relative;
         height: 100%;
         border-radius: 4px;
-        // display: flex;
-        // flex-direction: column;
+        flex: 1;
         overflow: hidden;
     }
     
@@ -516,6 +608,37 @@ export default {
     &.no-select {
         user-select: none;
     }
+
+    .left-bottom, .right-wrapper__top {
+        /deep/ .filter-item {
+            display: flex;
+            align-items: center;
+
+            .title {
+                padding-right: var(--default-padding);
+            }
+
+            .control {
+                width: calc(100% - 100px);
+                flex-grow: 1;
+            }
+        }
+    }   
+
+    .left-bottom {
+        /deep/ .filter-item {
+            + .filter-item {
+                margin-top: var(--default-padding);
+            }
+        }
+    }
+    .right-wrapper__top {
+        /deep/ .filter-item {
+            + .filter-item {
+                margin-left: var(--default-padding);
+            }
+        }
+    }  
 }
 
 .flex-container {
@@ -563,7 +686,6 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-right: 5px;
 
             .bar-button {
                 position: relative;

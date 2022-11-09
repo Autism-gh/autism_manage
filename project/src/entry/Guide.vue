@@ -5,11 +5,15 @@
 
         <el-button type="primary" @click="download2">嘿嘿嘿</el-button>
 
-        <div style="height: 400px; height: 500px">
+        <div style="height: 500px">
             <CodeArea color :code="code" ></CodeArea>
         </div>
 
-        
+        <div style="height: 100px;">
+            {{ formatData }}
+        </div>
+
+        <el-button type="primary" @click="beliveLight">你相信光吗？</el-button>
     </div>
 </template>
 
@@ -43,12 +47,39 @@
             };
         },
         watch: {
-
+            formatData(newVal) {
+                console.log('newVal', newVal)
+            } 
         },
         computed: {
+            // formatValue() {
+            //     return window.formatValue
+            // },
 
+            formatData: {
+                set(value) {
+                    window.formatValue = value
+                    console.log('value 设置了吗', value)
+                },
+                get() {
+                    console.log('value 获取了吗', this.formatValue)
+                    return this.formatValue
+                }
+            }
         },
         methods: {
+            
+
+            async beliveLight() {
+                // this.formatData = Math.floor(Math.random() * 10000)
+
+                this.formatData = Math.floor(Math.random() * 10000)
+                // window.formatValue = Math.floor(Math.random() * 10000)
+
+                console.log('window', window)
+                console.log('window', window.formatValue)
+            },
+
             download() {
 
             },
@@ -68,7 +99,21 @@
 
         },
         mounted() {
+            var formatValue = {};
+            var defaultName = Math.floor(Math.random() * 10000)
+            Object.defineProperty(formatValue, "name" ,{
+                get: function(){
+                    console.log('取值')
+                    return defaultName;
+                },
+                set: function(value){
+                    console.log('设置值', value)
+                    defaultName = value;
+                }
+            })
+            window.formatValue = formatValue
 
+            // Vue.set(window, 'formatValue', '浙A2B22P')
         },
     };
 </script>

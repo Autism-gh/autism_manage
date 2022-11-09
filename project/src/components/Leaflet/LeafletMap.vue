@@ -189,8 +189,11 @@ export default {
 }
 </style>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import './scss/leaflet-custom.scss';
+</style>
+
+<style lang="scss" scoped>
 .leaflet-container {
     position: relative;
     width: 100%;
