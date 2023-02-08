@@ -79,6 +79,10 @@
       moveFollow: {
         type: Boolean,
         default: false
+      },
+
+      haveRight: {
+          default: undefined,
       }
     },
     data() {
@@ -111,7 +115,11 @@
       },
 
       checkRightWrapper() {
-        return this.$slots.rightWrapper
+          if(this.haveRight !== undefined) {
+              return this.haveRight
+          } else {
+              return this.$slots.rightWrapper
+          }
       },
 
       // 最大值

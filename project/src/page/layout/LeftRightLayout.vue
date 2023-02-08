@@ -1,11 +1,14 @@
 <template>
-  <LeftRight :rightmost="sb">
+  <LeftRight v-model="test">
     <template slot="leftWrapper">
       迪迦！
     </template>
     <template slot="rightWrapper">
-      你要永远相信光
+      {{ test }}
     </template>
+
+    <el-button type="primary" @click="test = true">清空</el-button>
+    <el-button type="primary" @click="test = false">显示</el-button>
   </LeftRight>
 </template>
 <script>
@@ -16,7 +19,7 @@ export default {
   props: {  },
   data () {
     return {
-      sb: true
+      test: false
     }
   },
   computed: {

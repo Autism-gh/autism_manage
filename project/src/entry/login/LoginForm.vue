@@ -2,7 +2,7 @@
     <div class="loginform">
 
         <div class="loginform__header">
-            老闯YYDS
+            欢迎使用
         </div>
 
         <el-form ref="ruleForm" class="loginform__form" :model="modal.data" :rules="modal.rules">
