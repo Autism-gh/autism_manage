@@ -89,6 +89,7 @@ import reportRouter from './modules/report'
 import systemRouter from './modules/system'
 import demoRouter from './modules/demo'
 import layoutRouter from './modules/layout'
+import screenRouter from './modules/screen'
 /**
  * 
  * 
@@ -107,6 +108,7 @@ export const asyncRoutes = [
     systemRouter,
     demoRouter,
     layoutRouter,
+    screenRouter,
 
     // 404 page must be placed at the end !!!
     {

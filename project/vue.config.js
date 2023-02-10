@@ -11,8 +11,6 @@ const resolve = (dir) => {
     return path.join(__dirname, dir)
 }
 
-// const VueLoaderPlugin = require('vue-loader/lib/plugin')
-
 // const getIPAdress = () => {
 //     var interfaces = require('os').networkInterfaces()
 //     for (var devName in interfaces) {
@@ -28,19 +26,10 @@ const resolve = (dir) => {
 
 const port = process.env.port || process.env.npm_config_port || 5168
 
-
 module.exports = {
     lintOnSave: false,
 
     publicPath: '/',
-
-    configureWebpack: {
-        resolve: {
-            alias: {
-                '@': resolve('src')
-            }
-        }
-    },
 
     devServer: {
         // host: getIPAdress(),
@@ -51,55 +40,83 @@ module.exports = {
             errors: true
         },
         proxy: {
-            //  /?.app ***** 服务的接口
+            /**
+             * /?.app 服务的接口
+             */
             '/appapi': {
-                // target: 'http://admin.wuchuang.com:8088/',
                 target: 'http://admin.vehicle-dev.mokua.com:6080/',
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
-                  '^/appapi': '/'
+                    '^/appapi': '/'
                 }
             },
 
-            // /api/ ***** 服务的接口
+            /**
+             *  /api 服务的接口
+             */
             '/api': {
                 target: 'http://10.33.0.60:6012/',
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
-                  '^/api': '/'
+                    '^/api': '/'
                 }
             },
 
-            // /api. **** 服务的接口
+
+            /**
+             * /api. 服务的接口
+             */
             '/phpapi': {
-                // target: 'http://api.wuchuang.com:8088/',
                 target: 'http://api.vehicle-dev.mokua.com:6080/',
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
-                  '^/phpapi': '/'
+                    '^/phpapi': '/'
                 }
             }
         }
     },
 
-    // eslint-disable-next-line no-dupe-keys
-    configureWebpack: config => {
+    configureWebpack: (config) => {
         config.externals = assetsCDN.externals;
     },
 
-    // module: {
-    //     rules: [
-    //         {
-    //             test: /\.vue$/,
-    //             loader: 'vue-loader'
-    //         }
-    //     ]
-    // },
+    chainWebpack: (config) => {
 
-    // plugins: [
-    //     new VueLoaderPlugin()
-    // ]
+        // 添加 vh 单位大屏兼容模式
+        config.module
+            .rule('scssvh')
+            .test(/\.scss$/)
+            .pre()
+            .include.add(resolve('src/pagescreen')).end()
+            .oneOf('vue')
+            .resourceQuery(/verticalvh=true/)
+            .use('postcss-loader')
+                .loader('postcss-loader')
+                .options({
+                    config: {
+                        path: path.join(__dirname, './config/verticalvh')
+                    }
+                })
+                .end()
+        
+        // 添加 vw 单位大屏兼容模式
+        config.module
+            .rule('scssvw')
+            .test(/\.scss$/)
+            .pre()
+            .include.add(resolve('src/pagescreen')).end()
+            .oneOf('vue')
+            .resourceQuery(/horizontalvw=true/)
+            .use('postcss-loader')
+                .loader('postcss-loader')
+                .options({
+                    config: {
+                        path: path.join(__dirname, './config/horizontalvw')
+                    }
+                })
+                .end()
+    }
 }

@@ -1,6 +1,7 @@
 <template>
     <div>
-        首页测试最好使
+        欢迎使用
+        <!-- 首页测试最好使
         <el-button type="primary" @click="download">嘿嘿</el-button>
 
         <el-button type="primary" @click="download2">嘿嘿嘿</el-button>
@@ -11,17 +12,17 @@
 
         <div style="height: 100px;">
             {{ formatData }}
-        </div>
+        </div> -->
 
-        <el-button type="primary" @click="beliveLight">你相信光吗？</el-button>
+        <!-- <el-button type="primary" @click="beliveLight">你相信光吗？</el-button> -->
     </div>
 </template>
 
 <script>
-    import CodeArea from '@/components/CodeArea/CodeArea'
+    // import CodeArea from '@/components/CodeArea/CodeArea'
     export default {
         components: {
-            CodeArea
+            // CodeArea
         },
         props: {},
         name: 'ManageGuide',
