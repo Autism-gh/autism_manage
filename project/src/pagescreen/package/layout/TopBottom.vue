@@ -52,7 +52,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped horizontalvw>
-@import '../scss/common.scss';
+@import '../../scss/common.scss';
 
 .screen-Layout {
     .screen-header {

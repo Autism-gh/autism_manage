@@ -23,7 +23,7 @@
     </TopBottom>
 </template>
 <script>
-import TopBottom from '../../layout/TopBottom.vue'
+import TopBottom from '../../package/layout/TopBottom.vue'
 export default {
   name: 'DemoScreen',
   components: { TopBottom },
