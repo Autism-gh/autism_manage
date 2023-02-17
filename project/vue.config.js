@@ -89,7 +89,6 @@ module.exports = {
         config.module
             .rule('scssvh')
             .test(/\.scss$/)
-            .pre()
             .include.add(resolve('src/pagescreen')).end()
             .oneOf('vue')
             .resourceQuery(/verticalvh=true/)
@@ -106,7 +105,6 @@ module.exports = {
         config.module
             .rule('scssvw')
             .test(/\.scss$/)
-            .pre()
             .include.add(resolve('src/pagescreen')).end()
             .oneOf('vue')
             .resourceQuery(/horizontalvw=true/)

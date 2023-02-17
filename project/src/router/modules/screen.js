@@ -9,9 +9,25 @@ const screenRouter = {
     name: 'system',
     meta: {
         title: '大屏',
-        icon: 'el-icon-setting'
+        icon: 'el-icon-monitor'
     },
     children: [
+        {
+            path: 'demoscreen',
+            component: () => import('@/pagescreen/page/dictionary/BorderLayout.vue'),
+            name: 'DemoScreen',
+            meta: {
+                title: '边框字典'
+            }
+        },
+        {
+            path: 'demoscreen',
+            component: () => import('@/pagescreen/page/dictionary/HeaderLayout.vue'),
+            name: 'DemoScreen',
+            meta: {
+                title: 'Header字典'
+            }
+        },
         {
             path: 'demoscreen',
             component: () => import('@/pagescreen/page/DemoScreen/DemoScreen'),

@@ -90,6 +90,12 @@ import systemRouter from './modules/system'
 import demoRouter from './modules/demo'
 import layoutRouter from './modules/layout'
 import screenRouter from './modules/screen'
+import threejsRouter from './modules/threejs'
+import canvasRouter from './modules/canvas'
+import echartsRouter from './modules/echarts'
+
+
+
 /**
  * 
  * 
@@ -109,6 +115,9 @@ export const asyncRoutes = [
     demoRouter,
     layoutRouter,
     screenRouter,
+    threejsRouter,
+    canvasRouter,
+    echartsRouter,
 
     // 404 page must be placed at the end !!!
     {

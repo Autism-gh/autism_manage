@@ -1,14 +1,12 @@
 <template>
-    <div class="screen-wrapper">
-        <LeftMenu></LeftMenu>
-        <router-view />
+    <div>
+
     </div>
 </template>
 <script>
-    import LeftMenu from './components/LeftMenu.vue'
     export default {
-        name: '',
-        components: { LeftMenu },
+        name: 'BorderLayout',
+        components: {},
         props: {},
         data() {
             return {
@@ -16,7 +14,7 @@
             }
         },
         computed: {
-            
+
         },
         methods: {
 
@@ -39,8 +37,5 @@
     }
 </script>
 <style lang="scss" scoped>
-.screen-wrapper{
-    width: 100vw;
-    height: 100vh;
-}
+
 </style>

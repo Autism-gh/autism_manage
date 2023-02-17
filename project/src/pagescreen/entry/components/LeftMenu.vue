@@ -1,22 +1,21 @@
 <template>
-    <div class="screen-wrapper">
-        <LeftMenu></LeftMenu>
-        <router-view />
+    <div class="screen-left">
+        
     </div>
 </template>
 <script>
-    import LeftMenu from './components/LeftMenu.vue'
+    import { mapState } from 'vuex';
     export default {
-        name: '',
-        components: { LeftMenu },
+        name: 'LeftMenu',
+        components: {},
         props: {},
         data() {
             return {
-
+                
             }
         },
         computed: {
-            
+            ...mapState('permission', ['addRoutes'])
         },
         methods: {
 
@@ -28,10 +27,10 @@
 
         },
         beforeMount() {
-
+            
         },
         mounted() {
-
+            console.log('addRoutes', this.addRoutes)
         },
         beforeDestroy() {
 
@@ -39,8 +38,5 @@
     }
 </script>
 <style lang="scss" scoped>
-.screen-wrapper{
-    width: 100vw;
-    height: 100vh;
-}
+
 </style>
