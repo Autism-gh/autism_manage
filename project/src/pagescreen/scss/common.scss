@@ -3,26 +3,52 @@
     width: 100vw;
     height: 100vh;
 
-    .range-layout--50 {
+    .range {
+        position: relative;
+        padding-bottom: 10px;
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    .range-w50-h100 {
         width: 50%;
-        border: solid 1px #e5e5e5;
+        height: 100%;
     }
 
-    .range-layout--33 {
+    .range-w33-h100 {
         width: calc(100% / 3);
+        height: 100%;
     }
 
-    .range-layout--66 {
+    .range-w66-h100 {
         width: calc((100% / 3) * 2);
+        height: 100%;
     }
 
-    .range-layout--25 {
+    .range-w25-h100 {
         width: 25%;
-        border: solid 1px #e5e5e5;
+        height: 100%;
     }
 
-    .range-layout--75 {
+    .range-w75-h100 {
         width: 75%;
+        height: 100%;
+    }
+
+    .range-h33-w100 {
+        height: calc(100% / 3);
+        width: 100%;
+    }
+
+    .range-h66-w100 {
+        height: calc((100% / 3) * 2);
+        width: 100%;
+    }
+
+    .range-padding {
+        padding: 10px;
     }
 }
 

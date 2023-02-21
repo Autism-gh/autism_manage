@@ -1,21 +1,20 @@
 <template>
-    <div class="screen-left">
-        
+    <div>
+
     </div>
 </template>
 <script>
-    import { mapState } from 'vuex';
     export default {
-        name: 'LeftMenu',
+        name: 'Rotation',
         components: {},
         props: {},
         data() {
             return {
-                
+
             }
         },
         computed: {
-            ...mapState('permission', ['addRoutes'])
+
         },
         methods: {
 
@@ -27,10 +26,10 @@
 
         },
         beforeMount() {
-            
+
         },
         mounted() {
-            // console.log('addRoutes', this.addRoutes)
+
         },
         beforeDestroy() {
 

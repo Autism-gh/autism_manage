@@ -13,17 +13,17 @@ const screenRouter = {
     },
     children: [
         {
-            path: 'demoscreen',
+            path: 'borderlayout',
             component: () => import('@/pagescreen/page/dictionary/BorderLayout.vue'),
-            name: 'DemoScreen',
+            name: 'BorderLayout',
             meta: {
                 title: '边框字典'
             }
         },
         {
-            path: 'demoscreen',
+            path: 'headerlayout',
             component: () => import('@/pagescreen/page/dictionary/HeaderLayout.vue'),
-            name: 'DemoScreen',
+            name: 'HeaderLayout',
             meta: {
                 title: 'Header字典'
             }

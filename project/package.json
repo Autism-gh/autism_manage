@@ -13,6 +13,7 @@
     "core-js": "^3.23.3",
     "css-vars-ponyfill": "^2.4.7",
     "echarts": "^5.4.1",
+    "echarts4": "npm:echarts@4.9.0",
     "element-china-area-data": "^5.0.2",
     "element-ui": "^2.15.8",
     "flv.js": "^1.6.2",
