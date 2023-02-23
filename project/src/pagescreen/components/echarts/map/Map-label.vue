@@ -2,24 +2,50 @@
     <div :ref="$options.name" class="chartInstance" />
 </template>
 <script>
+    /**
+     * 
+     * 地图页面配色要改该全部嗷
+     * 
+     */
     import chartmixins from '../util/echart4mixins'
-    import {
-        seriesData,
-        lableData
-    } from '../../mockjson/labelmap'
-
+    import { seriesData, lableData } from '../mock/labelmap'
     export default {
-        name: 'LabelMap',
+        name: 'Map-label',
         components: {},
-        props: {},
+        props: {
+            chartData: {
+                type: Array,
+                default: () => []
+            },
+
+            chartStyle: {
+                type: Object,
+                default: () => {
+                    return {
+                        'labelColor': '#e5e5e5',
+                        'areaColor': 'rgba(0,0,0,0.25)',
+                        'borderColor': 'rgba(255,255,255,0.15)',
+                        'markerColor': '#ff8003',
+                        'emphasisColor': 'rgba(0,0,0,0.5)',
+                        'zoom': 1.1,
+                        'aspectScale': 0.85
+                    }
+                }
+            },
+
+            model: {
+                type: String,
+                default: 'map'
+            },
+        },
         mixins: [chartmixins],
         data() {
             return {
                 defaultOptions: {
                     geo: {
                         map: 'china',
-                        zoom: 1.1,
-                        aspectScale: 0.85,
+                        zoom: this.chartStyle.zoom,
+                        aspectScale: this.chartStyle.aspectScale,
                         layoutCenter: ["50%", "50%"], //地图位置
                         layoutSize: '100%',
                         label: {
@@ -30,34 +56,33 @@
                         roam: false,
                         itemStyle: {
                             normal: {
-                                areaColor: 'rgba(0,0,0,0.15)',
-                                borderColor: 'rgba(255,255,255,0.45)',
-
+                                areaColor: this.chartStyle.areaColor,
+                                borderColor: this.chartStyle.borderColor,
                                 shadowOffsetX: 0,
                                 shadowOffsetY: 15,
                                 opacity: 0.5,
                             },
                             emphasis: {
-                                areaColor: 'rgba(0,0,0,0.5)'
+                                areaColor: this.chartStyle.emphasisColor
                             }
                         },
                         
                         regions: [{
                             name: '南海诸岛',
                             itemStyle: {
-                                areaColor: 'rgba(0, 10, 52, 1)',
-                                borderColor: 'rgba(0, 10, 52, 1)',
+                                areaColor: this.chartStyle.areaColor,
+                                borderColor: this.chartStyle.borderColor,
                                 normal: {
                                     opacity: 0,
                                     label: {
                                         show: false,
-                                        color: "#009cc9",
+                                        color: this.chartStyle.labelColor,
                                     }
                                 },
                             },
                             label: {
                                 show: false,
-                                color: '#FFFFFF',
+                                color: this.chartStyle.labelColor,
                                 fontSize: 12,
                             },
                         }],
@@ -71,7 +96,7 @@
                         {
                             type: 'map',
                             mapType: 'china',
-                            aspectScale: 0.85,
+                            aspectScale: this.chartStyle.aspectScale,
                             layoutCenter: ["50%", "50%"], //地图位置
                             layoutSize: '100%',
                             zoom: 1.1, //当前视角的缩放比例
@@ -82,14 +107,14 @@
                             },
                             itemStyle: {
                                 normal: {
-                                    areaColor: 'rgba(0,0,0,0.25)',
-                                    borderColor: 'rgba(0,0,0,0.35)',
+                                    areaColor: this.chartStyle.areaColor,
+                                    borderColor: this.chartStyle.borderColor,
                                     // borderWidth: 1.5
                                 },
                                 emphasis: {
-                                    areaColor: 'rgba(0,0,0,0.5)',
+                                    areaColor: this.chartStyle.emphasisColor,
                                     label: {
-                                        color: "#fff",
+                                        color: this.chartStyle.labelColor,
                                         fontSize: this.formatFontSize(14)
                                     }
                                 }
@@ -105,7 +130,7 @@
                             type: 'effectScatter',
                             coordinateSystem: 'geo',
                             zlevel: 2,
-                            symbolSize: 10,
+                            symbolSize: this.formatFontSize(10),
 
                             /**
                              * 
@@ -113,8 +138,8 @@
                              * 
                              */
                             rippleEffect: { 
-                                period: 3,                  // 闪烁时常
-                                scale: 5,                   // 聚合点大小
+                                period: 3,                                      // 闪烁时常
+                                scale: this.formatFontSize(5),                   // 聚合点大小
                                 brushType: 'fill'
                             },
 
@@ -128,7 +153,7 @@
                                     show: true,
                                     position: 'right',
                                     formatter: '{b}',
-                                    color: '#b3e2f2',
+                                    color: this.chartStyle.labelColor,
                                     fontWeight: "bold",
                                     fontSize: this.formatFontSize(16)
                                 }
@@ -144,12 +169,8 @@
                             itemStyle: {
                                 normal: {
                                     show: true,
-                                    color: '#ff8003',               // 聚合点颜色
-                                    shadowBlur: 20,
-                                    shadowColor: '#fff'
-                                },
-                                emphasis: {
-                                    areaColor: '#f00'
+                                    color: this.chartStyle.markerColor,               // 聚合点颜色
+                                    shadowBlur: this.formatFontSize(20)
                                 }
                             },
                         },
@@ -159,16 +180,16 @@
                             type: 'lines',
                             zlevel: 3,
                             symbol: 'circle',
-                            symbolSize: [5, 5],
-                            color: '#ff8003',
-                            opacity: 1,
+                            symbolSize: [this.formatFontSize(5), this.formatFontSize(5)],
+                            // color: 'red',
+                            // opacity: 1,
                             label: {
                                 show: true,
                                 padding: [this.formatFontSize(10), this.formatFontSize(15)],
                                 color: '#fff',
-                                backgroundColor: "rgba(0,0,0,0.65)",
-                                borderColor: 'rgba(0,0,0,0.25)',
-                                borderWidth: 1,
+                                backgroundColor: this.chartStyle.areaColor,
+                                borderColor: this.chartStyle.borderColor,
+                                borderWidth: this.formatFontSize(1),
                                 borderRadius: this.formatFontSize(6),
                                 formatter(params) {
                                     let arr = [params.name, "废水污染：" + params.value[1] + "家", "废气污染：" + params.value[0] + "家"];
@@ -182,7 +203,7 @@
                             },
                             lineStyle: {
                                 type: 'solid',
-                                color: '#999999',
+                                color: this.chartStyle.borderColor,
                                 width: this.formatFontSize(1),
                                 opacity: 1,
                             },
@@ -196,7 +217,7 @@
 
         },
         methods: {
-            refreshChartData() {
+            refreshMockData() {
                 const last = this.defaultOptions.series.length - 1
                 this.defaultOptions.series[1].data = seriesData
                 // this.defaultOptions.series[2].data = seriesData
@@ -214,7 +235,8 @@
 
         },
         mounted() {
-            this.refreshChartData()
+            this.refreshMockData()
+            // this.refreshApiData()
         },
         beforeDestroy() {
 

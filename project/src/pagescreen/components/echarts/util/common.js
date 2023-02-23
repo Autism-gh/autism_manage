@@ -22,5 +22,9 @@ export const colorOptions = {
         '#E06895',
         '#EEA99D',
         '#79E898'
+    ],
+
+    map: [
+        '#3ed4ff', '#ffa022', '#a6c84c'
     ]
 }

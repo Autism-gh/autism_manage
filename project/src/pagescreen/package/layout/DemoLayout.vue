@@ -52,7 +52,7 @@
         position: relative;
         width: 100%;
         height: 100%;
-        background: var(--menu-bg);
+        background: #010101;
         background-size: 100% 100%;
 
         .header {

@@ -274,6 +274,7 @@
         },
         mounted() {
             this.refreshMockData()
+            this.handleRefreshStyle(this.chartStyleOptions)
             // this.refreshApiData()
         },
         beforeDestroy() {

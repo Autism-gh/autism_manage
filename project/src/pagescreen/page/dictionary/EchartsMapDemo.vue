@@ -1,5 +1,5 @@
 <template>
-    <DemoLayout title="Echarts Bar Demo">
+    <DemoLayout title="Echarts Map Demo">
         <div class="echart-bar-content">
             <div class="bordercard" v-for="(item, index) in echartBarDemo" :key="index">
                 <Quadrangle :title="item.name">

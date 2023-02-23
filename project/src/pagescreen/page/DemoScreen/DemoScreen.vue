@@ -2,9 +2,10 @@
     <NormalLayout class="screen-Layout demoscreen">
         <CircleImageLoading v-model="demoLoading"></CircleImageLoading>
         <template slot="header">
-            <div class="demoscreen__header">
+            <Theader></Theader>
+            <!-- <div class="demoscreen__header">
                 <RealTime></RealTime>
-            </div>
+            </div> -->
         </template>
         <template slot="left">
             <div class="demoscreen__left">
@@ -61,16 +62,18 @@
     </NormalLayout>
 </template>
 <script>
+    import Theader from '../../package/header/Theader.vue'
     import CircleImageLoading from '../../components/loading/CircleImageLoading.vue'
     import NormalLayout from '../../package/layout/NormalLayout.vue'
     import ActiveBorder from '../../package/border/Quadrangle.vue'
-    import ProgressPie from '../../components/echarts/pie/ProgressPie.vue'
+    import ProgressPie from '../../components/echarts/pie/Pie-progress'
     import KewWord from '../../components/manual/KewWord.vue'
-    // import CurrentMap from '../../components/echarts/map/FlywireMap.vue'
-    import CurrentMap from '../../components/echarts/map/TransmitMap.vue'
-    // import CurrentMap from '../../components/echarts/map/LabelMap.vue'
 
-    import RealTime from '../../components/manual/RealTime.vue'
+    import CurrentMap from '../../components/echarts/map/Map-transmit.vue'
+    // import CurrentMap from '../../components/echarts/map/Map-label.vue'
+    // import CurrentMap from '../../components/echarts/map/Map-flywire.vue'
+
+    // import RealTime from '../../components/manual/RealTime.vue'
     import RollTable from '../../components/manual/RollTable.vue'
     import { timeSleep } from '../../util/common'
 
@@ -85,6 +88,7 @@
     export default {
         name: 'DemoScreen',
         components: {
+            Theader,
             CircleImageLoading,
             NormalLayout,
             ActiveBorder,
@@ -92,7 +96,7 @@
             KewWord,
             CurrentMap,
             RollTable,
-            RealTime,
+            // RealTime,
             Barhorline,
             Linehorline,
             Barhorgradient,

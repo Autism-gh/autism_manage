@@ -1,14 +1,17 @@
 <template>
     <DemoLayout title="Echarts Pie Demo">
-        <div class="echart-pie-content">
+        <div class="echart-line-content">
             <div class="bordercard" v-for="(item, index) in echartBarDemo" :key="index">
-                <component :is="item.component"></component>
+                <Quadrangle :title="item.name">
+                    <component :is="item.component"></component>
+                </Quadrangle>
             </div>
         </div>
     </DemoLayout>
 </template>
 <script>
     import DemoLayout from '../../package/layout/DemoLayout.vue'
+    import Quadrangle from '../../package/border/Quadrangle.vue'
 
     const allBorder = require.context("../../components/echarts/pie", false, /\.vue$/);
 
@@ -22,6 +25,7 @@
     });
 
     resComponents[DemoLayout.name] = DemoLayout
+    resComponents[Quadrangle.name] = Quadrangle
 
     export default {
         name: 'EchartsPieDemo',
@@ -55,8 +59,8 @@
         },
     }
 </script>
-<style lang="scss" scoped>
-    .echart-pie-content {
+<style lang="scss" scoped horizontalvw>
+    .echart-line-content {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-evenly;
@@ -64,6 +68,7 @@
 
     .bordercard {
         height: 300px;
+        width: calc((100% - 60px) / 3);
         width: 30%;
         margin-bottom: 20px;
     }

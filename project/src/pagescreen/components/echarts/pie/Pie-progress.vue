@@ -6,13 +6,28 @@
     import * as echarts from 'echarts'
 
     export default {
-        name: 'PieFinish',
+        name: 'Pie-progress',
         components: {},
         mixins: [chartmixins],
         props: {
             chartData: {
                 type: Number,
                 default: 63
+            },
+
+            chartStyle: {
+                type: Object,
+                default: () => {
+                    return {
+                        'labelColor': '#e5e5e5',
+                        'lineColor': 'rgba(66, 66, 66, .1)',
+                        'borderColor': '#5269EE',
+                        'seriesColor': [
+                            { offset: 0, color: "#16CEB9" },
+                            { offset: 1, color: "#6648FF" }
+                        ],
+                    }
+                }
             }
         },
         data() {
@@ -25,7 +40,7 @@
                             left: "center",
                             textStyle: {
                                 fontSize: this.formatFontSize(24),
-                                color: "#FFFFFF",
+                                color: this.chartStyle.labelColor,
                                 fontWeight: 600
                             }
                         },
@@ -34,7 +49,7 @@
                             top: "52%",
                             left: "center",
                             textStyle: {
-                                color: "#FFFFFF",
+                                color: this.chartStyle.labelColor,
                                 fontSize: this.formatFontSize(20),
                                 fontWeight: 300
                             }
@@ -69,20 +84,12 @@
                             name: "数据",
                             type: "bar",
                             roundCap: true,
-                            barWidth: 30,
+                            barWidth: this.formatFontSize(30),
                             showBackground: true,
                             data: [0],
                             coordinateSystem: "polar",
                             itemStyle: {
-                                color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                        offset: 0,
-                                        color: "#16CEB9"
-                                    },
-                                    {
-                                        offset: 1,
-                                        color: "#6648FF"
-                                    }
-                                ])
+                                color: new echarts.graphic.LinearGradient(0, 1, 0, 0, this.chartStyle.seriesColor)
                             }
                         },
 
@@ -92,9 +99,9 @@
                             radius: ["70%"],
                             center: ["50%", "50%"],
                             itemStyle: {
-                                color: "rgba(66, 66, 66, 0.1)",
-                                borderWidth: 1,
-                                borderColor: "#5269EE"
+                                color: this.chartStyle.lineColor,
+                                borderWidth: this.formatFontSize(1),
+                                borderColor: this.chartStyle.borderColor
                             },
                             data: [100]
                         },
@@ -104,9 +111,9 @@
                             radius: ["50%"],
                             center: ["50%", "50%"],
                             itemStyle: {
-                                color: "rgba(66, 66, 66, .1)",
-                                borderWidth: 1,
-                                borderColor: "#5269EE"
+                                color: this.chartStyle.lineColor,
+                                borderWidth: this.formatFontSize(1),
+                                borderColor: this.chartStyle.borderColor
                             },
                             data: [100]
                         }

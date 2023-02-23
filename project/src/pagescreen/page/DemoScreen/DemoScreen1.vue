@@ -48,9 +48,10 @@
 <script>
     import NormalLayout from '../../package/layout/NormalLayout.vue'
     import ActiveBorder from '../../package/border/HeaderBorder.vue'
-
-
-    import CurrentMap from '../../components/echarts/map/TransmitMap.vue'
+    // import CurrentMap from '../../components/echarts/map/Map-transmit.vue'
+    // import CurrentMap from '../../components/echarts/map/Map-label.vue'
+    import CurrentMap from '../../components/echarts/map/Map-flywire.vue'
+    
     export default {
         name: 'DemoScreen1',
         components: {
