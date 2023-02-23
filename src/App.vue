@@ -1,57 +1,53 @@
 <template>
-  <div id="app">
-    <router-view />
+    <div id="app">
+        <router-view />
 
-    <MyWife></MyWife>
+        <MyWife></MyWife>
 
-    <el-drawer
-      title="系统设置"
-      :modal="false"
-      size="300px"
-      :visible.sync="systemSetting"
-      direction="rtl">
-      <Setting></Setting>
-    </el-drawer>
+        <el-drawer title="系统设置" :modal="false" size="300px" :visible.sync="systemSetting" direction="rtl">
+            <Setting></Setting>
+        </el-drawer>
 
-  </div>
+    </div>
 </template>
 
 <script>
-import MyWife from '@/entry/wife/MyWife'
-import Setting from '../src/entry/app/Setting'
-export default {
-  name: 'App',
-  components: {
-    MyWife,
-    Setting
-  },
-  computed: {
-
-    systemSetting: {
-        get() {
-            return this.$store.state.settings.systemSetting
+    import MyWife from '@/entry/wife/MyWife'
+    import Setting from '../src/entry/app/Setting'
+    export default {
+        name: 'App',
+        components: {
+            MyWife,
+            Setting
         },
-        set(val) {
-            this.$store.dispatch('settings/switchChange', val)
+        computed: {
+
+            systemSetting: {
+                get() {
+                    return this.$store.state.settings.systemSetting
+                },
+                set(val) {
+                    this.$store.dispatch('settings/switchChange', val)
+                }
+            },
         }
-    },
-  }
-}
+    }
 </script>
 
 <style>
-html, body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-}
+    html,
+    body {
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
 
-#app {
-    position: relative;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
+    #app {
+        position: relative;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
 </style>
