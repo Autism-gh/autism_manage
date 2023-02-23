@@ -1,9 +1,9 @@
 <template>
-    <div class="demo-layout">
+    <div class="demo-layout screen-Layout">
         <div class="header">
             {{ title }}
         </div>
-        <div class="content">
+        <div class="content hide-scrollbar">
             <slot></slot>
         </div>
     </div>
@@ -67,6 +67,7 @@
         .content {
             height: calc(100% - 100px);
             width: 100%;
+            overflow-y: auto;
         }
     }
 </style>

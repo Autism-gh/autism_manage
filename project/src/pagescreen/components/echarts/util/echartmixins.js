@@ -10,7 +10,10 @@ export default {
     data() {
         return {
             chartInstance: null,
-            resizeHandler: null
+            resizeHandler: null,
+
+            noData: false,
+            errorMsg: ''
         }
     },
     props: {
@@ -74,6 +77,25 @@ export default {
         },
         resize() {
             this.chartInstance && this.chartInstance.resize()
+        },
+
+
+        change16IntoRgb(color) {
+            let r = /^#?[0-9A-Fa-f]{6}$/;
+            if (!r.test(color)) return alert('输入错误的hex颜色值');
+            color = color.replace("#", "");
+            let hxs = color.match(/../g);
+            for (let i = 0; i < 3; i++) hxs[i] = parseInt(hxs[i], 16);
+            return `rgba(${ hxs.join(',') })`;
+        },
+
+        change16IntoRgba(color, alpha) {
+            let r = /^#?[0-9A-Fa-f]{6}$/;
+            if (!r.test(color)) return alert('输入错误的hex颜色值');
+            color = color.replace("#", "");
+            let hxs = color.match(/../g);
+            for (let i = 0; i < 3; i++) hxs[i] = parseInt(hxs[i], 16);
+            return `rgba(${ hxs.join(',') }, ${ alpha })`;
         },
 
 

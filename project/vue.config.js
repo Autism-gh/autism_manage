@@ -34,7 +34,7 @@ module.exports = {
     devServer: {
         // host: getIPAdress(),
         port: port,
-        open: true,
+        open: { app:{ name: 'chrome' } },
         overlay: {
             warnings: false,
             errors: true

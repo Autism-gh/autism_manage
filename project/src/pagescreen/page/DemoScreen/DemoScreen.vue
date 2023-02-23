@@ -3,7 +3,7 @@
         <CircleImageLoading v-model="demoLoading"></CircleImageLoading>
         <template slot="header">
             <div class="demoscreen__header">
-
+                <RealTime></RealTime>
             </div>
         </template>
         <template slot="left">
@@ -19,7 +19,9 @@
                     </ActiveBorder>
                 </div>
                 <div class="range range-h33-w100">
-                    <ActiveBorder title="左侧图3"></ActiveBorder>
+                    <ActiveBorder>
+                        <RollTable></RollTable>
+                    </ActiveBorder>
                 </div>
             </div>
         </template>
@@ -27,24 +29,32 @@
             <div class="demoscreen__center">
                 <div class="range range-h66-w100">
                     <ActiveBorder title="中间图1">
-                        <TransmitMap></TransmitMap>
+                        <CurrentMap></CurrentMap>
                     </ActiveBorder>
                 </div>
                 <div class="range range-h33-w100">
-                    <ActiveBorder title="中间图2"></ActiveBorder>
+                    <ActiveBorder title="中间图2">
+                        <Barhorgradient :chartStyle="seriesColor"></Barhorgradient>
+                    </ActiveBorder>
                 </div>
             </div>
         </template>
         <template slot="right">
             <div class="demoscreen__right">
                 <div class="range range-h33-w100">
-                    <ActiveBorder title="右侧图1"></ActiveBorder>
+                    <ActiveBorder title="右侧图1">
+                        <Barhorline></Barhorline>
+                    </ActiveBorder>
                 </div>
                 <div class="range range-h33-w100">
-                    <ActiveBorder title="右侧图2"></ActiveBorder>
+                    <ActiveBorder title="右侧图2">
+                        <Linehorline></Linehorline>
+                    </ActiveBorder>
                 </div>
                 <div class="range range-h33-w100">
-                    <ActiveBorder title="右侧图3"></ActiveBorder>
+                    <ActiveBorder title="右侧图3">
+                        <Linehorpile></Linehorpile>
+                    </ActiveBorder>
                 </div>
             </div>
         </template>
@@ -53,12 +63,24 @@
 <script>
     import CircleImageLoading from '../../components/loading/CircleImageLoading.vue'
     import NormalLayout from '../../package/layout/NormalLayout.vue'
-    import ActiveBorder from '../../package/border/HeaderBorder.vue'
+    import ActiveBorder from '../../package/border/Quadrangle.vue'
     import ProgressPie from '../../components/echarts/pie/ProgressPie.vue'
     import KewWord from '../../components/manual/KewWord.vue'
-    // import FlywireMap from '../../components/echarts/map/FlywireMap.vue'
-    import TransmitMap from '../../components/echarts/map/TransmitMap.vue'
+    // import CurrentMap from '../../components/echarts/map/FlywireMap.vue'
+    import CurrentMap from '../../components/echarts/map/TransmitMap.vue'
+    // import CurrentMap from '../../components/echarts/map/LabelMap.vue'
+
+    import RealTime from '../../components/manual/RealTime.vue'
+    import RollTable from '../../components/manual/RollTable.vue'
     import { timeSleep } from '../../util/common'
+
+
+    import Barhorline from '../../components/echarts/bar/Bar-hor-line.vue'
+    import Linehorline from '../../components/echarts/line/Line-hor-line.vue'
+
+    import Barhorgradient from '../../components/echarts/bar/Bar-hor-gradient.vue'
+
+    import Linehorpile from '../../components/echarts/line/Line-hor-pile.vue'
 
     export default {
         name: 'DemoScreen',
@@ -68,13 +90,26 @@
             ActiveBorder,
             ProgressPie,
             KewWord,
-            // FlywireMap,
-            TransmitMap
+            CurrentMap,
+            RollTable,
+            RealTime,
+            Barhorline,
+            Linehorline,
+            Barhorgradient,
+            Linehorpile
         },
         props: {},
         data() {
             return {
-                demoLoading: false
+                demoLoading: false,
+
+                seriesColor: {
+                    seriesColor: [
+                        { offset: 0,  color: 'rgb(255, 121, 64)' },
+                        { offset: 0.5, color: 'rgb(255, 121, 64)' },
+                        { offset: 1, color: '#e5e5e5'}
+                    ]
+                }
             }
         },
         computed: {

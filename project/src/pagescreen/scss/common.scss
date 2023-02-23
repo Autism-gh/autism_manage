@@ -49,6 +49,37 @@
 
     .range-padding {
         padding: 10px;
+        // background: rgba($color: #000000, $alpha: 1.0);
     }
-}
 
+    .hide-scrollbar {
+        ::-webkit-scrollbar {
+            z-index: 11;
+            width: 0;
+    
+            &:horizontal {
+                height: 0;
+            }
+    
+            &-thumb {
+                border-radius: 5px;
+                width: 0;
+                background: transparent;
+            }
+    
+            &-corner {
+                background: transparent;
+            }
+    
+            &-track {
+                background: transparent;
+    
+                &-piece {
+                    background: transparent;
+                    width: 0;
+                }
+            }
+        }
+    }
+    
+}

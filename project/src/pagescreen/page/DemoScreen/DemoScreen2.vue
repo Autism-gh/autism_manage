@@ -29,7 +29,7 @@
 import ActiveLayout from '../../package/layout/LeftFixedLayout.vue'
 import ActiveBorder from '../../package/border/HeaderBorder.vue'
 export default {
-  name: 'DemoScreen',
+  name: 'DemoScreen2',
   components: { ActiveLayout, ActiveBorder },
   props: {  },
   data () {

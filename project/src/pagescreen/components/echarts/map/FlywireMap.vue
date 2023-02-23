@@ -36,6 +36,7 @@
                     },
                     geo: {
                         map: 'china',
+                        zoom: 1.1,
                         label: {
                             emphasis: {
                                 show: false
@@ -45,10 +46,10 @@
                         itemStyle: {
                             normal: {
                                 areaColor: 'rgba(0,0,0,0.25)',
-                                borderColor: '#0177ff'
+                                borderColor: 'rgba(0,0,0,0.35)'
                             },
                             emphasis: {
-                                areaColor: '#071537' //鼠标指上市时的颜色
+                                areaColor: 'rgba(0,0,0,0.5)' 
                             }
                         }
                     },
@@ -74,7 +75,7 @@
                                 color: '#46bee9'
                             }
                         },
-                        data: allData.citys
+                        data: []
                     }, {
                         name: '线路',
                         type: 'lines',
@@ -102,7 +103,7 @@
                                 curveness: 0.1
                             }
                         },
-                        data: allData.moveLines
+                        data: []
                     }]
                 }
             }
@@ -111,7 +112,16 @@
 
         },
         methods: {
+            refreshMockData() {
+                const { citys, moveLines } = allData
+                this.defaultOptions.series[0].data = citys
+                this.defaultOptions.series[1].data = moveLines
+                this.setOption(this.defaultOptions, true)
+            },
 
+            refreshChartData() {
+
+            }
         },
         beforeCreate() {
 
@@ -123,7 +133,8 @@
 
         },
         mounted() {
-            
+            this.refreshMockData()
+            // this.refreshChartData()
         },
         beforeDestroy() {
 

@@ -6,7 +6,7 @@ const screenRouter = {
     path: '/screenpage',
     component: Layout,
     redirect: 'noRedirect',
-    name: 'system',
+    name: 'screen',
     meta: {
         title: '大屏',
         icon: 'el-icon-monitor'
@@ -17,7 +17,7 @@ const screenRouter = {
             component: () => import('@/pagescreen/page/dictionary/BorderLayout.vue'),
             name: 'BorderLayout',
             meta: {
-                title: '边框字典'
+                title: '字典(Border)'
             }
         },
         {
@@ -25,7 +25,39 @@ const screenRouter = {
             component: () => import('@/pagescreen/page/dictionary/HeaderLayout.vue'),
             name: 'HeaderLayout',
             meta: {
-                title: 'Header字典'
+                title: '字典(Header)'
+            }
+        },
+        {
+            path: 'echartsBarDemo',
+            component: () => import('@/pagescreen/page/dictionary/EchartsBarDemo.vue'),
+            name: 'EchartsBarDemo',
+            meta: {
+                title: '字典(echarts-bar)'
+            }
+        },
+        {
+            path: 'echartsLineDemo',
+            component: () => import('@/pagescreen/page/dictionary/EchartsLineDemo.vue'),
+            name: 'EchartsLineDemo',
+            meta: {
+                title: '字典(echarts-line)'
+            }
+        },
+        {
+            path: 'echartsPieDemo',
+            component: () => import('@/pagescreen/page/dictionary/EchartsPieDemo.vue'),
+            name: 'EchartsPieDemo',
+            meta: {
+                title: '字典(echarts-pie)'
+            }
+        },
+        {
+            path: 'echartsMapDemo',
+            component: () => import('@/pagescreen/page/dictionary/EchartsMapDemo.vue'),
+            name: 'EchartsMapDemo',
+            meta: {
+                title: '字典(echarts-map)'
             }
         },
         {
@@ -37,11 +69,19 @@ const screenRouter = {
             }
         },
         {
-            path: 'zhengzhou',
-            component: () => import('@/pagescreen/page/ZhengZhou/ZhengZhou'),
-            name: 'ZhengZhou',
+            path: 'demoscreen2',
+            component: () => import('@/pagescreen/page/DemoScreen/DemoScreen1'),
+            name: 'DemoScreen1',
             meta: {
-                title: '郑州大屏'
+                title: 'Demo大屏2'
+            }
+        },
+        {
+            path: 'demoscreen3',
+            component: () => import('@/pagescreen/page/DemoScreen/DemoScreen2'),
+            name: 'DemoScreen2',
+            meta: {
+                title: 'Demo大屏3'
             }
         }
     ]

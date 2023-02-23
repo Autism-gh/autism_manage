@@ -15,7 +15,7 @@
         props: {
             title: {
                 type: String,
-                default: '背景渐变框'
+                default: ''
             },
 
             styleOptions: {

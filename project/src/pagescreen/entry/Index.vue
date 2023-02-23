@@ -39,7 +39,8 @@
     }
 </script>
 <style lang="scss" scoped>
-.screen-wrapper{
+.screen-wrapper {
+    position: relative;
     width: 100vw;
     height: 100vh;
 }
