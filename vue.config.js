@@ -31,6 +31,8 @@ module.exports = {
 
     publicPath: '/',
 
+    outputDir: 'dist',
+
     devServer: {
         // host: getIPAdress(),
         port: port,
